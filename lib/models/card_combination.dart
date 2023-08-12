@@ -13,7 +13,7 @@ class CardCombinationFields {
   static const secondCardId = 'secondCardId';
   static const value = 'value';
 }
-///taro card combination model, represents the meaning of the combination of two cards
+///tarot card combination model, represents the meaning of the combination of two cards
 class CardCombintaion {
   int cardCombinationId;
   int firstCardId;

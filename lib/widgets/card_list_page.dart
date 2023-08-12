@@ -4,7 +4,7 @@ import 'package:taro_cards/ads/ad_helper.dart';
 import 'package:taro_cards/models/taro_card.dart';
 import '../pages/card_page.dart';
 
-///builds grid view with taro cards
+///builds grid view with tarot cards
 class TaroCardsList extends StatefulWidget {
   final List<TaroCard> taroCards;
   const TaroCardsList({Key? key, required this.taroCards}) : super(key: key);
@@ -31,7 +31,7 @@ class _CardPageListState extends State<TaroCardsList> {
   Widget buildTaroCards() => GridView.builder(
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 200,
-        childAspectRatio: 1 / 1.25,
+        childAspectRatio: 1 / 1.72,
         crossAxisSpacing: 5,
         mainAxisSpacing: 5,
       ),

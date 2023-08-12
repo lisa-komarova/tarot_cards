@@ -11,9 +11,9 @@ import '../database/cards_database.dart';
 import '../widgets/card_value_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-///cardpage widget is for displaying taro card and its values
+///cardpage widget is for displaying tarot card and its values
 class CardPage extends StatefulWidget {
-  ///taro card id
+  ///tarot card id
   final int cardId;
 
   const CardPage({Key? key, required this.cardId}) : super(key: key);
@@ -23,7 +23,6 @@ class CardPage extends StatefulWidget {
 
 class _CardPageState extends State<CardPage> {
   late TaroCard taroCard;
-  late String cardDetails;
   late CardValue cardValue;
   bool isLoading = true;
   BannerAd? _bannerAd;
@@ -58,7 +57,6 @@ class _CardPageState extends State<CardPage> {
 
   @override
   Widget build(BuildContext context) {
-    print('BUILD TARO');
     return Container(
       color: Theme.of(context).backgroundColor,
       width: double.infinity,
@@ -68,23 +66,12 @@ class _CardPageState extends State<CardPage> {
     );
   }
 
-  ///reads taro card from db
+  ///reads tarot card from db
   Future getTaroCard() async {
     taroCard = (await TaroCardsDatabase.instance.readTaroCard(widget.cardId))!;
-    cardDetails = "НАЗВАНИЕ АРКАНА: " +
-        taroCard.cardName +
-        " \n"
-            " КАТЕГОРИЯ: " +
-        taroCard.category +
-        " \n"
-            " ПРЯМОЕ ПОЛОЖЕНИЕ: " +
-        taroCard.upward +
-        "\n"
-            " ПЕРЕВЕРНУТОЕ ПОЛОЖЕНИЕ:  " +
-        taroCard.downward;
   }
 
-  ///builds taro card, its values and combination of the card with other cards
+  ///builds tarot card, its values and combination of the card with other cards
   Widget buildTaroCard() {
     return SingleChildScrollView(
       child: Column(
@@ -103,11 +90,36 @@ class _CardPageState extends State<CardPage> {
               ),
             ),
           Padding(
-            padding: const EdgeInsets.all(10),
-            child: DropCapText(cardDetails,
-                style: Theme.of(context).textTheme.headline6,
-                dropCap: DropCap(
-                    width: 170, height: 212, child: buildTaroCardImage())),
+            padding: const EdgeInsets.all(10.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: 200,
+                  height: 345,
+                  child: _buildTaroCardImage(),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildCardCharacteristic(
+                            "НАЗВАНИЕ АРКАНА: ", taroCard.cardName),
+                        _buildCardCharacteristic(
+                            "КАТЕГОРИЯ: ", taroCard.category),
+                        _buildCardCharacteristic(
+                            "ПРЯМОЕ ПОЛОЖЕНИЕ: ", taroCard.upward),
+                        _buildCardCharacteristic(
+                            "ПЕРЕВЕРНУТОЕ ПОЛОЖЕНИЕ: ", taroCard.downward),
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
           ),
           Column(
             children: [
@@ -160,8 +172,28 @@ class _CardPageState extends State<CardPage> {
     );
   }
 
-  ///builds a container with the image of a taro card
-  Widget buildTaroCardImage() {
+  ///builds basic characteristics of a tarot card
+  Column _buildCardCharacteristic(String characteristic, String value) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          characteristic,
+          style: Theme.of(context).textTheme.titleMedium!.copyWith(
+              color: Theme.of(context).colorScheme.onBackground,
+              fontWeight: FontWeight.bold),
+        ),
+        Text(
+          value,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+      ],
+    );
+  }
+
+  ///builds a container with the image of a tarot card
+  Widget _buildTaroCardImage() {
     return Container(
       margin: const EdgeInsets.all(10),
       alignment: Alignment.center,

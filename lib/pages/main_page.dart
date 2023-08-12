@@ -14,10 +14,10 @@ class MainPage extends StatefulWidget {
 }
 
 class _CardsListState extends State<MainPage> {
-  ///list of taro vards
+  ///list of tarot cards
   late List<TaroCard> taroCards;
 
-  ///list of taro vards for search implementation
+  ///list of tarot cards for search implementation
   late List<TaroCard> duplicateTaroCards = [];
   bool isLoading = false;
 

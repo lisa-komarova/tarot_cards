@@ -18,7 +18,7 @@ class TaroCardsFields {
   static const String downward = 'downward';
   static const String imagePath = 'imagePath';
 }
-///taro card model
+///tarot card model
 class TaroCard {
   final int cardId;
   final String cardName;
