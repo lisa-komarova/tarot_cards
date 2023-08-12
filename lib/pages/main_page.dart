@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:taro_cards/widgets/card_list_page.dart';
 import 'package:taro_cards/widgets/custom_app_bar.dart';
 
-import '../datebase/cards_database.dart';
+import '../database/cards_database.dart';
 import '../models/taro_card.dart';
 
 ///main page with app bar, list of cards, bottom navigation bar

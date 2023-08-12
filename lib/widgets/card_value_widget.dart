@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:taro_cards/models/card_value.dart';
 
-///builds text with value of a card
+///builds text with the value of a card
 class CardValueWidget extends StatefulWidget {
   final String title;
   final List<CardValue?>? cardValues;
-  const CardValueWidget({Key? key, required this.title, required this.cardValues})
+  const CardValueWidget(
+      {Key? key, required this.title, required this.cardValues})
       : super(key: key);
   @override
   _CardValueWidgetState createState() => _CardValueWidgetState();
@@ -75,7 +76,7 @@ class _CardValueWidgetState extends State<CardValueWidget> {
       case "Значение карты дня":
         return Column(
           children: [
-            Text(widget.cardValues![2]!.upward,
+            Text(widget.cardValues![3]!.upward,
                 style: Theme.of(context).textTheme.headline6),
           ],
         );

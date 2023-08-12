@@ -1,6 +1,6 @@
 const String tableTaroCards = 'TaroCards';
 
-//taro card model
+
 class TaroCardsFields {
   static final List<String> values = [
     cardId,
@@ -18,7 +18,7 @@ class TaroCardsFields {
   static const String downward = 'downward';
   static const String imagePath = 'imagePath';
 }
-
+///taro card model
 class TaroCard {
   final int cardId;
   final String cardName;

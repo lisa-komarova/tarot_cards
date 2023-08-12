@@ -3,7 +3,7 @@ import 'package:taro_cards/models/card_value.dart';
 import 'package:taro_cards/models/taro_card.dart';
 import 'package:taro_cards/widgets/card_value_widget.dart';
 
-import '../datebase/cards_database.dart';
+import '../database/cards_database.dart';
 
 ///widget for showing and hiding value of a card
 class CardValueButton extends StatefulWidget {

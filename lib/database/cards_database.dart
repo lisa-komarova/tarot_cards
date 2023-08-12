@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:taro_cards/models/card_combination.dart';
 import '../models/card_value.dart';
 import '../models/taro_card.dart';
 
@@ -46,7 +47,7 @@ class TaroCardsDatabase {
     }
   }
 
-  ///getting taro card's values by id
+  ///gets taro card's values by id
   Future<List<CardValue?>> readTaroCardValues(int id) async {
     final db = await instance.database;
     List<dynamic> whereArguments = [id];
@@ -56,6 +57,33 @@ class TaroCardsDatabase {
       whereArgs: whereArguments,
     );
     return result.map((json) => CardValue.fromJson(json)).toList();
+  }
+
+  ///gets all taro cards
+  Future<List<TaroCard>> readAllTaroCards() async {
+    final db = await instance.database;
+    final result = await db!.query(
+      tableTaroCards,
+    );
+    return result.map((json) => TaroCard.fromJson(json)).toList();
+  }
+
+  ///gets the meaning of combination of two cards
+  Future<CardCombintaion?> readCombination(
+      TaroCard firstCard, TaroCard secondCard) async {
+    final db = await instance.database;
+    List<dynamic> whereArguments = [firstCard.cardId, secondCard.cardId];
+    final result = await db!.query(
+      tableCardCombination,
+      where:
+          '${CardCombinationFields.firstCardId} = ? and ${CardCombinationFields.secondCardId} = ?',
+      whereArgs: whereArguments,
+    );
+    if (result.isNotEmpty) {
+      return CardCombintaion.fromJson(result.first);
+    } else {
+      return null;
+    }
   }
 
   ///gets all major arcana cards
