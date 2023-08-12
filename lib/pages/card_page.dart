@@ -1,15 +1,13 @@
-import 'package:drop_cap_text/drop_cap_text.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:taro_cards/ads/ad_helper.dart';
 import 'package:taro_cards/models/card_value.dart';
 import 'package:taro_cards/models/taro_card.dart';
 import 'package:taro_cards/widgets/combination_widget.dart';
+import 'package:taro_cards/widgets/source_widget.dart';
 
 import '../database/cards_database.dart';
 import '../widgets/card_value_button.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 ///cardpage widget is for displaying tarot card and its values
 class CardPage extends StatefulWidget {
@@ -143,29 +141,17 @@ class _CardPageState extends State<CardPage> {
                 title: "Совет карты",
                 taroCard: taroCard,
               ),
+              CardValueButton(
+                title: "Значение да/нет",
+                taroCard: taroCard,
+              ),
               CombinationWidget(
                 taroCard: taroCard,
               ),
             ],
           ),
-          Container(
-            padding: const EdgeInsets.only(left: 10, bottom: 5),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: RichText(
-                text: TextSpan(
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = (() => {
-                            launchUrl(Uri.parse(
-                                'https://astrohelper.ru/gadaniya/taro/znachenie/'))
-                          }),
-                    text: "Источник",
-                    style: Theme.of(context)
-                        .textTheme
-                        .headline6!
-                        .copyWith(fontStyle: FontStyle.italic)),
-              ),
-            ),
+          const SourceWidget(
+            url: 'https://astrohelper.ru/gadaniya/taro/znachenie/',
           ),
         ],
       ),

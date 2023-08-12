@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:taro_cards/models/card_value.dart';
+import 'package:taro_cards/widgets/source_widget.dart';
 
 ///builds text with the value of a card
 class CardValueWidget extends StatefulWidget {
@@ -85,6 +86,31 @@ class _CardValueWidgetState extends State<CardValueWidget> {
           Text(widget.cardValues![4]!.upward,
               style: Theme.of(context).textTheme.headline6),
         ]);
+      case "Значение да/нет":
+        return Column(
+          children: [
+            Text("Прямое положение: ",
+                style: Theme.of(context)
+                    .textTheme
+                    .headline6!
+                    .copyWith(fontWeight: FontWeight.bold)),
+            Text(widget.cardValues![5]!.upward,
+                style: Theme.of(context).textTheme.headline6),
+            Text("Обратное положение: ",
+                style: Theme.of(context)
+                    .textTheme
+                    .headline6!
+                    .copyWith(fontWeight: FontWeight.bold)),
+            Text(widget.cardValues![5]!.downward,
+                style: Theme.of(context).textTheme.headline6),
+            const SizedBox(
+              height: 10,
+            ),
+            const SourceWidget(
+              url: 'https://magya-online.ru/',
+            ),
+          ],
+        );
       default:
         return Container();
     }
