@@ -9,7 +9,6 @@ class SourceWidget extends StatelessWidget {
     required this.url,
   }) : super(key: key);
 
-
   @override
   Widget build(BuildContext context) {
     return Container(

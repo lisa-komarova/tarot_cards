@@ -49,7 +49,7 @@ class _CardsListState extends State<MainPage> {
             ? const CircularProgressIndicator()
             : taroCards.isEmpty
                 ? Text(
-                    "Таких карт нет!",
+                    "Таких карт нет ˙◠˙",
                     style: Theme.of(context).textTheme.headline6,
                   )
                 : TaroCardsList(

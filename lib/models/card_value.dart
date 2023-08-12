@@ -1,6 +1,5 @@
 String tableCardValues = 'CardValue';
 
-
 class CardValuesFields {
   static final List<String> values = [
     cardValueId,
@@ -16,6 +15,7 @@ class CardValuesFields {
   static const upward = 'upward';
   static const downward = 'downward';
 }
+
 ///card values model, represents the meaning of a card in different situations
 class CardValue {
   final int cardValueId;

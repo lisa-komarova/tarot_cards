@@ -13,6 +13,7 @@ class CardCombinationFields {
   static const secondCardId = 'secondCardId';
   static const value = 'value';
 }
+
 ///tarot card combination model, represents the meaning of the combination of two cards
 class CardCombintaion {
   int cardCombinationId;
@@ -33,17 +34,19 @@ class CardCombintaion {
       };
   static CardCombintaion fromJson(Map<String, Object?> json) {
     return CardCombintaion(
-        cardCombinationId: json[CardCombinationFields.cardCombinationId] as int,
-        firstCardId: json[CardCombinationFields.firstCardId] as int,
-        secondCardId: json[CardCombinationFields.secondCardId] as int,
-        value: json[CardCombinationFields.value] as String,);
+      cardCombinationId: json[CardCombinationFields.cardCombinationId] as int,
+      firstCardId: json[CardCombinationFields.firstCardId] as int,
+      secondCardId: json[CardCombinationFields.secondCardId] as int,
+      value: json[CardCombinationFields.value] as String,
+    );
   }
 
-  CardCombintaion copy(
-          {int? cardCombinationId,
-          int? firstCardId,
-          int? secondCardId,
-          String? value,}) =>
+  CardCombintaion copy({
+    int? cardCombinationId,
+    int? firstCardId,
+    int? secondCardId,
+    String? value,
+  }) =>
       CardCombintaion(
           cardCombinationId: cardCombinationId ?? this.cardCombinationId,
           firstCardId: firstCardId ?? this.firstCardId,

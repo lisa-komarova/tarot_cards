@@ -7,6 +7,7 @@ import 'package:taro_cards/models/card_combination.dart';
 import '../models/card_value.dart';
 import '../models/taro_card.dart';
 
+///database with tarot cards, its values and combinations
 class TaroCardsDatabase {
   static final TaroCardsDatabase instance = TaroCardsDatabase._init();
   static Database? _database;
