@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:taro_cards/ads/ad_helper.dart';
 import 'package:taro_cards/models/card_value.dart';
 import 'package:taro_cards/models/taro_card.dart';
+import 'package:taro_cards/widgets/ad_widget.dart';
 import 'package:taro_cards/widgets/combination_widget.dart';
 import 'package:taro_cards/widgets/source_widget.dart';
 
@@ -23,50 +22,32 @@ class _CardPageState extends State<CardPage> {
   late TaroCard taroCard;
   late CardValue cardValue;
   bool isLoading = true;
-  BannerAd? _bannerAd;
 
   @override
   void initState() {
     super.initState();
     getTaroCard();
-    BannerAd(
-      adUnitId: AdHelper.bannerAdUnitId,
-      request: const AdRequest(),
-      size: AdSize.banner,
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          setState(() {
-            _bannerAd = ad as BannerAd;
-            isLoading = false;
-          });
-        },
-        onAdFailedToLoad: (ad, err) {
-          ad.dispose();
-        },
-      ),
-    ).load();
-  }
-
-  @override
-  void dispose() {
-    _bannerAd?.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).backgroundColor,
-      width: double.infinity,
-      child: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : buildTaroCard(),
+    return SafeArea(
+      child: Container(
+        color: Theme.of(context).backgroundColor,
+        width: double.infinity,
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : buildTaroCard(),
+      ),
     );
   }
 
   ///reads tarot card from db
   Future getTaroCard() async {
     taroCard = (await TaroCardsDatabase.instance.readTaroCard(widget.cardId))!;
+    setState(() {
+            isLoading = false;
+    });
   }
 
   ///builds tarot card, its values and combination of the card with other cards
@@ -76,17 +57,9 @@ class _CardPageState extends State<CardPage> {
         children: [
           const SizedBox(
             width: double.infinity,
-            height: 40,
+            height: 10,
           ),
-          if (_bannerAd != null)
-            Align(
-              alignment: Alignment.topCenter,
-              child: SizedBox(
-                width: _bannerAd!.size.width.toDouble(),
-                height: _bannerAd!.size.height.toDouble(),
-                child: AdWidget(ad: _bannerAd!),
-              ),
-            ),
+          const BannerAdvertisment(),
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: Row(

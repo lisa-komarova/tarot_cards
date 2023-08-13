@@ -36,27 +36,29 @@ class _CardsListState extends State<MainPage> {
   ///builds app bar, list of cards and bottom navigation
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(80),
-        child: CustomAppBar(
-            searchHandler: _searchCards, controller: editingController),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Theme.of(context).backgroundColor,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(90),
+          child: CustomAppBar(
+              searchHandler: _searchCards, controller: editingController),
+        ),
+        body: Container(
+          alignment: Alignment.center,
+          child: isLoading
+              ? const CircularProgressIndicator()
+              : taroCards.isEmpty
+                  ? Text(
+                      "Таких карт нет ˙◠˙",
+                      style: Theme.of(context).textTheme.headline6,
+                    )
+                  : TaroCardsList(
+                      taroCards: taroCards,
+                    ),
+        ),
+        bottomNavigationBar: buildMyNavBar(context),
       ),
-      body: Container(
-        alignment: Alignment.center,
-        child: isLoading
-            ? const CircularProgressIndicator()
-            : taroCards.isEmpty
-                ? Text(
-                    "Таких карт нет ˙◠˙",
-                    style: Theme.of(context).textTheme.headline6,
-                  )
-                : TaroCardsList(
-                    taroCards: taroCards,
-                  ),
-      ),
-      bottomNavigationBar: buildMyNavBar(context),
     );
   }
 

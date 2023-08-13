@@ -163,10 +163,11 @@ class _CombinationWidgetState extends State<CombinationWidget> {
                     )
                   : SizedBox(
                       width: double.infinity,
-                      child: Text(
-                        'Значение: ${_cardCombintaion.value}',
-                        style: Theme.of(context).textTheme.headline6,
-                      ),
+                      child: Text('Значение: ${_cardCombintaion.value}',
+                          style: Theme.of(context)
+                              .textTheme
+                              .headline6!
+                              .copyWith(fontSize: 18)),
                     ),
             ),
           ],

@@ -26,14 +26,14 @@ class _CardValueWidgetState extends State<CardValueWidget> {
                     .headline6!
                     .copyWith(fontWeight: FontWeight.bold)),
             Text(widget.cardValues![0]!.upward,
-                style: Theme.of(context).textTheme.headline6),
+                style: Theme.of(context).textTheme.headline6!.copyWith(fontSize: 18)),
             Text("Обратное положение: ",
                 style: Theme.of(context)
                     .textTheme
                     .headline6!
                     .copyWith(fontWeight: FontWeight.bold)),
             Text(widget.cardValues![0]!.downward,
-                style: Theme.of(context).textTheme.headline6),
+                style: Theme.of(context).textTheme.headline6!.copyWith(fontSize: 18)),
           ],
         );
       case "Значение в любви и отношениях":
@@ -45,14 +45,14 @@ class _CardValueWidgetState extends State<CardValueWidget> {
                     .headline6!
                     .copyWith(fontWeight: FontWeight.bold)),
             Text(widget.cardValues![1]!.upward,
-                style: Theme.of(context).textTheme.headline6),
+                style: Theme.of(context).textTheme.headline6!.copyWith(fontSize: 18)),
             Text("Обратное положение: ",
                 style: Theme.of(context)
                     .textTheme
                     .headline6!
                     .copyWith(fontWeight: FontWeight.bold)),
             Text(widget.cardValues![1]!.downward,
-                style: Theme.of(context).textTheme.headline6),
+                style: Theme.of(context).textTheme.headline6!.copyWith(fontSize: 18)),
           ],
         );
       case "В ситуации и вопросе":
@@ -64,27 +64,27 @@ class _CardValueWidgetState extends State<CardValueWidget> {
                     .headline6!
                     .copyWith(fontWeight: FontWeight.bold)),
             Text(widget.cardValues![2]!.upward,
-                style: Theme.of(context).textTheme.headline6),
+                style: Theme.of(context).textTheme.headline6!.copyWith(fontSize: 18)),
             Text("Обратное положение: ",
                 style: Theme.of(context)
                     .textTheme
                     .headline6!
                     .copyWith(fontWeight: FontWeight.bold)),
             Text(widget.cardValues![2]!.downward,
-                style: Theme.of(context).textTheme.headline6),
+                style: Theme.of(context).textTheme.headline6!.copyWith(fontSize: 18)),
           ],
         );
       case "Значение карты дня":
         return Column(
           children: [
             Text(widget.cardValues![3]!.upward,
-                style: Theme.of(context).textTheme.headline6),
+                style: Theme.of(context).textTheme.headline6!.copyWith(fontSize: 18)),
           ],
         );
       case "Совет карты":
         return Column(children: [
           Text(widget.cardValues![4]!.upward,
-              style: Theme.of(context).textTheme.headline6),
+                style: Theme.of(context).textTheme.headline6!.copyWith(fontSize: 18)),
         ]);
       case "Значение да/нет":
         return Column(
@@ -95,14 +95,14 @@ class _CardValueWidgetState extends State<CardValueWidget> {
                     .headline6!
                     .copyWith(fontWeight: FontWeight.bold)),
             Text(widget.cardValues![5]!.upward,
-                style: Theme.of(context).textTheme.headline6),
+                style: Theme.of(context).textTheme.headline6!.copyWith(fontSize: 18)),
             Text("Обратное положение: ",
                 style: Theme.of(context)
                     .textTheme
                     .headline6!
                     .copyWith(fontWeight: FontWeight.bold)),
             Text(widget.cardValues![5]!.downward,
-                style: Theme.of(context).textTheme.headline6),
+                style: Theme.of(context).textTheme.headline6!.copyWith(fontSize: 18)),
             const SizedBox(
               height: 10,
             ),
