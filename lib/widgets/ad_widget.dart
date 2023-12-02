@@ -48,9 +48,9 @@ class _BannerAdvertismentState extends State<BannerAdvertisment> {
       width: double.infinity,
       child: isLoading
           ? const SizedBox(
-            height: 50,
-            width: double.infinity,
-          )
+              height: 50,
+              width: double.infinity,
+            )
           : _buildAd(),
     );
   }
