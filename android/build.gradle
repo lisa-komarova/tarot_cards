@@ -6,7 +6,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0'
+        classpath 'com.android.tools.build:gradle:7.4.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -15,6 +15,39 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        // IronSource
+        maven {
+            url 'https://android-sdk.is.com/'
+        }
+        // IronSource
+        maven {
+            url 'https://android-sdk.is.com/'
+        }
+
+// Pangle
+        maven {
+            url 'https://artifact.bytedance.com/repository/pangle'
+        }
+
+// Tapjoy
+        maven {
+            url "https://sdk.tapjoy.com/"
+        }
+
+// Mintegral
+        maven {
+            url "https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea"
+        }
+
+// Chartboost
+        maven {
+            url "https://cboost.jfrog.io/artifactory/chartboost-ads/"
+        }
+
+// AppNext
+        maven {
+            url "https://dl.appnext.com/"
+        }
     }
 }
 
@@ -29,7 +62,3 @@ subprojects {
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
-compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }

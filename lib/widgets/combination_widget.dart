@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:taro_cards/database/cards_database.dart';
@@ -8,19 +10,52 @@ import 'package:taro_cards/models/taro_card.dart';
 ///combination with a chosen card from the drop-down-list
 class CombinationWidget extends StatefulWidget {
   final TaroCard taroCard;
-  const CombinationWidget({Key? key, required this.taroCard}) : super(key: key);
+  const CombinationWidget({super.key, required this.taroCard});
 
   @override
   State<CombinationWidget> createState() => _CombinationWidgetState();
 }
 
-class _CombinationWidgetState extends State<CombinationWidget> {
+class _CombinationWidgetState extends State<CombinationWidget>
+    with SingleTickerProviderStateMixin {
+  static const _color = Colors.white;
+
+  late final _controller = AnimationController(vsync: this);
   bool visibility = false;
   bool isLoading = true;
   late TaroCard _secondCard;
   List<TaroCard> _taroCards = [];
   late final Future<List<TaroCard>> _loadedTaroCards;
   late CardCombintaion _cardCombintaion;
+  void _toggleCard() {
+    setState(() => visibility = !visibility);
+    switch (_controller.status) {
+      case AnimationStatus.dismissed:
+        _controller.forward();
+        break;
+      case AnimationStatus.forward:
+        _controller.reverse();
+        break;
+      case AnimationStatus.reverse:
+        _controller.forward();
+        break;
+      case AnimationStatus.completed:
+        _controller.reverse();
+        break;
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _controller.duration = const Duration(milliseconds: 500);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -53,7 +88,7 @@ class _CombinationWidgetState extends State<CombinationWidget> {
   }
 
   ///sets the second card and gets its combination
-  _changeSecondCard(String? taroCardName) {
+  void _changeSecondCard(dynamic taroCardName) {
     if (taroCardName != null) {
       setState(() {
         _secondCard = _taroCards
@@ -68,7 +103,7 @@ class _CombinationWidgetState extends State<CombinationWidget> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Theme.of(context).backgroundColor,
+      color: Theme.of(context).colorScheme.background,
       child: FutureBuilder(
           future: _loadedTaroCards,
           builder: ((context, snapshot) {
@@ -93,37 +128,41 @@ class _CombinationWidgetState extends State<CombinationWidget> {
       Padding(
         padding: const EdgeInsets.all(8.0),
         child: GestureDetector(
-          onTap: () => setState(() => visibility = !visibility),
-          child: Container(
-            alignment: Alignment.center,
-            width: double.infinity,
-            height: 60,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Расчитать комбинации',
-                    style: Theme.of(context).textTheme.headline6,
-                    textAlign: TextAlign.center,
-                  ),
+          onTap: _toggleCard,
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (_, __) => Container(
+              alignment: Alignment.center,
+              width: double.infinity,
+              height: 60,
+              decoration: DecorationTween(
+                begin: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                  color: _color,
                 ),
-                Container(
-                    child: visibility == true
-                        ? const Icon(
-                            Icons.arrow_drop_up,
-                            color: Color(0xFF5E017D),
-                            size: 60,
-                          )
-                        : const Icon(
-                            Icons.arrow_drop_down,
-                            color: Color(0xFF5E017D),
-                            size: 60,
-                          )),
-              ],
+                end: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(15)),
+                  color: _color.withOpacity(0.4),
+                ),
+              ).evaluate(_controller),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Расcчитать комбинации',
+                      style: Theme.of(context).textTheme.titleLarge,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  Transform.rotate(
+                      angle: Tween(begin: 0.0, end: pi).evaluate(_controller),
+                      child: const Icon(
+                        Icons.arrow_drop_up,
+                        color: Color(0xFF5E017D),
+                        size: 60,
+                      )),
+                ],
+              ),
             ),
           ),
         ),
@@ -132,31 +171,50 @@ class _CombinationWidgetState extends State<CombinationWidget> {
         Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.only(top: 18, right: 18, left: 18),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Expanded(
                     flex: 1,
                     child: DropdownSearch(
-                      mode: Mode.DIALOG,
-                      items: taroCardsNames,
-                      dropdownSearchDecoration: const InputDecoration(
-                        labelText: "Вторая карта",
+                      popupProps: PopupProps.dialog(
+                        showSearchBox: true,
+                        searchFieldProps: TextFieldProps(
+                            decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(25.0),
+                          ),
+                        )),
+                        emptyBuilder: (context, searchEntry) => const Center(
+                          child: Text('Нет такой карты ˙◠˙'),
+                        ),
                       ),
+                      items: taroCardsNames,
+                      dropdownDecoratorProps: DropDownDecoratorProps(
+                          dropdownSearchDecoration: InputDecoration(
+                        border: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                        label: Text(
+                          "Вторая карта",
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      )),
                       onChanged: _changeSecondCard,
                       selectedItem: _secondCard.cardName,
-                      showSearchBox: true,
-                      emptyBuilder: (context, searchEntry) => const Center(
-                        child: Text('Нет такой карты ˙◠˙'),
-                      ),
                     ),
                   )
                 ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(18.0),
+              padding: const EdgeInsets.only(bottom: 18, right: 18, left: 18),
               child: isLoading
                   ? const Center(
                       child: CircularProgressIndicator(),
@@ -166,7 +224,7 @@ class _CombinationWidgetState extends State<CombinationWidget> {
                       child: Text('Значение: ${_cardCombintaion.value}',
                           style: Theme.of(context)
                               .textTheme
-                              .headline6!
+                              .titleLarge!
                               .copyWith(fontSize: 18)),
                     ),
             ),

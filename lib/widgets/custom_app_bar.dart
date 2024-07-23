@@ -6,8 +6,7 @@ class CustomAppBar extends StatefulWidget {
   final TextEditingController controller;
 
   const CustomAppBar(
-      {Key? key, required this.searchHandler, required this.controller})
-      : super(key: key);
+      {super.key, required this.searchHandler, required this.controller});
 
   @override
   State<CustomAppBar> createState() => _CustomAppBarState();
@@ -56,7 +55,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                       ),
                       child: TextField(
                           controller: widget.controller,
-                          style: Theme.of(context).textTheme.headline6,
+                          style: Theme.of(context).textTheme.titleLarge,
                           cursorHeight: 0,
                           cursorWidth: 0,
                           focusNode: myFocusNode,

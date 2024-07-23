@@ -1,31 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:taro_cards/ads/ad_helper.dart';
 import 'package:taro_cards/models/taro_card.dart';
+import 'package:yandex_mobileads/mobile_ads.dart';
 import '../pages/card_page.dart';
 
 ///builds grid view with tarot cards
 class TaroCardsList extends StatefulWidget {
   final List<TaroCard> taroCards;
-  const TaroCardsList({Key? key, required this.taroCards}) : super(key: key);
+  const TaroCardsList({super.key, required this.taroCards});
   @override
-  _CardPageListState createState() => _CardPageListState();
+  State createState() => _CardPageListState();
 }
 
 class _CardPageListState extends State<TaroCardsList> {
   InterstitialAd? _interstitialAd;
+  late final Future<InterstitialAdLoader> _adLoader;
   int numberOfCardsOpened = 0;
-  @override
-  void dispose() {
-    _interstitialAd?.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       child: buildTaroCards(),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    MobileAds.initialize();
+    _adLoader = _createInterstitialAdLoader();
+    _loadInterstitialAd();
   }
 
   Widget buildTaroCards() => GridView.builder(
@@ -72,8 +75,12 @@ class _CardPageListState extends State<TaroCardsList> {
                           color: const Color(0xFF5E017D),
                           borderRadius: BorderRadius.circular(15)),
                       child: FittedBox(
-                        child: Image.network(widget.taroCards[index].imagePath),
                         fit: BoxFit.fitHeight,
+                        child: Image.network(
+                          widget.taroCards[index].imagePath,
+                          errorBuilder: ((context, error, stackTrace) =>
+                              const SizedBox()),
+                        ),
                       )),
                 ),
                 Container(
@@ -81,29 +88,31 @@ class _CardPageListState extends State<TaroCardsList> {
                     child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(widget.taroCards[index].cardName,
-                            style: Theme.of(context).textTheme.headline6)))
+                            style: Theme.of(context).textTheme.titleLarge)))
               ],
             ),
           ),
         );
       });
 
-  ///loading ad
-  void _loadInterstitialAd() {
-    InterstitialAd.load(
-      adUnitId: AdHelper.interstitialAdUnitId,
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          ad.fullScreenContentCallback = FullScreenContentCallback(
-            onAdDismissedFullScreenContent: (ad) {},
-          );
-          setState(() {
-            _interstitialAd = ad;
-          });
-        },
-        onAdFailedToLoad: (err) {},
-      ),
+  Future<InterstitialAdLoader> _createInterstitialAdLoader() {
+    return InterstitialAdLoader.create(
+      onAdLoaded: (InterstitialAd interstitialAd) {
+        // The ad was loaded successfully. Now you can show loaded ad
+        _interstitialAd = interstitialAd;
+      },
+      onAdFailedToLoad: (error) {
+        // Ad failed to load with AdRequestError.
+        // Attempting to load a new ad from the onAdFailedToLoad() method is strongly discouraged.
+      },
     );
+  }
+
+  Future<void> _loadInterstitialAd() async {
+    final adLoader = await _adLoader;
+    await adLoader.loadAd(
+        adRequestConfiguration: const AdRequestConfiguration(
+            adUnitId:
+                'R-M-3620673-2')); // for debug you can use 'demo-interstitial-yandex'
   }
 }

@@ -7,10 +7,10 @@ import '../models/taro_card.dart';
 
 ///main page with app bar, list of cards, bottom navigation bar
 class MainPage extends StatefulWidget {
-  const MainPage({Key? key}) : super(key: key);
+  const MainPage({super.key});
 
   @override
-  _CardsListState createState() => _CardsListState();
+  State createState() => _CardsListState();
 }
 
 class _CardsListState extends State<MainPage> {
@@ -38,7 +38,7 @@ class _CardsListState extends State<MainPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
+        backgroundColor: Theme.of(context).colorScheme.background,
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(90),
           child: CustomAppBar(
@@ -51,7 +51,7 @@ class _CardsListState extends State<MainPage> {
               : taroCards.isEmpty
                   ? Text(
                       "Таких карт нет ˙◠˙",
-                      style: Theme.of(context).textTheme.headline6,
+                      style: Theme.of(context).textTheme.titleLarge,
                     )
                   : TaroCardsList(
                       taroCards: taroCards,

@@ -1,68 +1,81 @@
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:taro_cards/ads/ad_helper.dart';
+import 'package:yandex_mobileads/mobile_ads.dart';
 
 ///builds banner ad
-class BannerAdvertisment extends StatefulWidget {
-  const BannerAdvertisment({Key? key}) : super(key: key);
+class BannerAdvertisement extends StatefulWidget {
+  final int screenWidth;
+  const BannerAdvertisement({super.key, required this.screenWidth});
 
   @override
-  State<BannerAdvertisment> createState() => _BannerAdvertismentState();
+  State<BannerAdvertisement> createState() => _BannerAdvertisementState();
 }
 
-class _BannerAdvertismentState extends State<BannerAdvertisment> {
-  bool isLoading = true;
+class _BannerAdvertisementState extends State<BannerAdvertisement> {
   BannerAd? _bannerAd;
+  var isBannerAlreadyCreated = false;
+
+  _loadAd() async {
+    _bannerAd = _createBanner();
+    setState(() {
+      isBannerAlreadyCreated = true;
+    });
+  }
+
+  BannerAdSize _getAdSize() {
+    return BannerAdSize.sticky(width: widget.screenWidth);
+  }
+
+  _createBanner() {
+    return BannerAd(
+        adUnitId: 'R-M-3620673-1', // or 'demo-banner-yandex'
+        adSize: _getAdSize(),
+        adRequest: const AdRequest(),
+        onAdLoaded: () {
+          if (!mounted) {
+            _bannerAd!.destroy();
+            return;
+          }
+        },
+        onAdFailedToLoad: (error) {
+          // Ad failed to load with AdRequestError.
+          // Attempting to load a new ad from the onAdFailedToLoad() method is strongly discouraged.
+        },
+        onAdClicked: () {
+          // Called when a click is recorded for an ad.
+        },
+        onLeftApplication: () {
+          // Called when user is about to leave application (e.g., to go to the browser), as a result of clicking on the ad.
+        },
+        onReturnedToApplication: () {
+          // Called when user returned to application after click.
+        },
+        onImpression: (impressionData) {
+          // Called when an impression is recorded for an ad.
+        });
+  }
 
   @override
   void initState() {
     super.initState();
-    BannerAd(
-      adUnitId: AdHelper.bannerAdUnitId,
-      request: const AdRequest(),
-      size: AdSize.banner,
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          setState(() {
-            _bannerAd = ad as BannerAd;
-            isLoading = false;
-          });
-        },
-        onAdFailedToLoad: (ad, err) {
-          ad.dispose();
-        },
-      ),
-    ).load();
-  }
-
-  @override
-  void dispose() {
-    _bannerAd?.dispose();
-    super.dispose();
+    MobileAds.initialize();
+    _loadAd();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Theme.of(context).backgroundColor,
+      color: Theme.of(context).colorScheme.background,
       width: double.infinity,
-      child: isLoading
-          ? const SizedBox(
-              height: 50,
-              width: double.infinity,
-            )
-          : _buildAd(),
+      child: _buildAd(),
     );
   }
 
   Widget _buildAd() {
-    if (_bannerAd != null) {
+    if (isBannerAlreadyCreated) {
       return Align(
         alignment: Alignment.topCenter,
         child: SizedBox(
-          width: _bannerAd!.size.width.toDouble(),
-          height: _bannerAd!.size.height.toDouble(),
-          child: AdWidget(ad: _bannerAd!),
+          child: AdWidget(bannerAd: _bannerAd!),
         ),
       );
     } else {

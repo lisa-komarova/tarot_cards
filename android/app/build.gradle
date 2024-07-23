@@ -29,7 +29,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion 34
     //compileSdkVersion flutter.compileSdkVersion
 
     compileOptions {
@@ -49,7 +49,7 @@ android {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.lvcorporation.taro_cards"
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
@@ -76,31 +76,6 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.android.support:multidex:2.0.1' //enter the latest multidex version
-    implementation 'com.yandex.android:mobileads-mediation:6.2.0.0'
-}
-
-// IronSource
-maven {
-       url 'https://android-sdk.is.com/'
-}
-             
-// Pangle
-maven { 
-       url 'https://artifact.bytedance.com/repository/pangle'
-}
-             
-// Tapjoy
-maven { 
-       url "https://sdk.tapjoy.com/"
-}
-             
-// Mintegral
-maven { 
-       url "https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea"
-}
-
-// Chartboost
-maven { 
-       url "https://cboost.jfrog.io/artifactory/chartboost-ads/" 
+    implementation 'com.android.support:multidex:2.0.1'
+    implementation 'com.yandex.android:mobileads-mediation:7.0.1.0'
 }

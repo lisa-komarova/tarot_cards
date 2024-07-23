@@ -1,8 +1,7 @@
 import 'dart:io';
-
 import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
+import 'package:path/path.dart' as p;
 import 'package:taro_cards/models/card_combination.dart';
 import '../models/card_value.dart';
 import '../models/taro_card.dart';
@@ -23,7 +22,7 @@ class TaroCardsDatabase {
   ///initializes datebase
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
-    final path = join(dbPath, filePath);
+    final path = p.join(dbPath, filePath);
     await deleteDatabase(path);
     ByteData data = await rootBundle.load("assets/cards.db");
     List<int> bytes =

@@ -1,21 +1,22 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:taro_cards/models/card_value.dart';
 import 'package:taro_cards/models/taro_card.dart';
 import 'package:taro_cards/widgets/ad_widget.dart';
+import 'package:taro_cards/widgets/card_value_button_animated.dart';
 import 'package:taro_cards/widgets/combination_widget.dart';
 import 'package:taro_cards/widgets/source_widget.dart';
 
 import '../database/cards_database.dart';
-import '../widgets/card_value_button.dart';
 
 ///cardpage widget is for displaying tarot card and its values
 class CardPage extends StatefulWidget {
   ///tarot card id
   final int cardId;
 
-  const CardPage({Key? key, required this.cardId}) : super(key: key);
+  const CardPage({super.key, required this.cardId});
   @override
-  _CardPageState createState() => _CardPageState();
+  State createState() => _CardPageState();
 }
 
 class _CardPageState extends State<CardPage> {
@@ -33,7 +34,7 @@ class _CardPageState extends State<CardPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Container(
-        color: Theme.of(context).backgroundColor,
+        color: Theme.of(context).colorScheme.background,
         width: double.infinity,
         child: isLoading
             ? const Center(child: CircularProgressIndicator())
@@ -46,7 +47,7 @@ class _CardPageState extends State<CardPage> {
   Future getTaroCard() async {
     taroCard = (await TaroCardsDatabase.instance.readTaroCard(widget.cardId))!;
     setState(() {
-            isLoading = false;
+      isLoading = false;
     });
   }
 
@@ -59,7 +60,9 @@ class _CardPageState extends State<CardPage> {
             width: double.infinity,
             height: 10,
           ),
-          const BannerAdvertisment(),
+          BannerAdvertisement(
+            screenWidth: MediaQuery.of(context).size.width.round(),
+          ),
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: Row(
@@ -71,21 +74,31 @@ class _CardPageState extends State<CardPage> {
                   child: _buildTaroCardImage(),
                 ),
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildCardCharacteristic(
-                            "НАЗВАНИЕ АРКАНА: ", taroCard.cardName),
-                        _buildCardCharacteristic(
-                            "КАТЕГОРИЯ: ", taroCard.category),
-                        _buildCardCharacteristic(
-                            "ПРЯМОЕ ПОЛОЖЕНИЕ: ", taroCard.upward),
-                        _buildCardCharacteristic(
-                            "ПЕРЕВЕРНУТОЕ ПОЛОЖЕНИЕ: ", taroCard.downward),
-                      ],
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: 345,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildCardCharacteristic(
+                                "НАЗВАНИЕ\nАРКАНА: ", taroCard.cardName),
+                            _buildCardCharacteristic(
+                                "КАТЕГОРИЯ: ", taroCard.category),
+                            if (taroCard.category == "Старшие арканы")
+                              _buildCardCharacteristic("НОМЕР АРКАНА: ",
+                                  (taroCard.cardId - 1).toString()),
+                            _buildCardCharacteristic(
+                                "ПРЯМОЕ\nПОЛОЖЕНИЕ: ", taroCard.upward),
+                            _buildCardCharacteristic(
+                                "ПЕРЕВЕРНУТОЕ\nПОЛОЖЕНИЕ: ", taroCard.downward),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 )
@@ -94,27 +107,27 @@ class _CardPageState extends State<CardPage> {
           ),
           Column(
             children: [
-              CardValueButton(
+              CardValueButtonAnimated(
                 title: "Общее значение",
                 taroCard: taroCard,
               ),
-              CardValueButton(
+              CardValueButtonAnimated(
                 title: "Значение в любви и отношениях",
                 taroCard: taroCard,
               ),
-              CardValueButton(
+              CardValueButtonAnimated(
                 title: "В ситуации и вопросе",
                 taroCard: taroCard,
               ),
-              CardValueButton(
+              CardValueButtonAnimated(
                 title: "Значение карты дня",
                 taroCard: taroCard,
               ),
-              CardValueButton(
+              CardValueButtonAnimated(
                 title: "Совет карты",
                 taroCard: taroCard,
               ),
-              CardValueButton(
+              CardValueButtonAnimated(
                 title: "Значение да/нет",
                 taroCard: taroCard,
               ),
@@ -132,21 +145,22 @@ class _CardPageState extends State<CardPage> {
   }
 
   ///builds basic characteristics of a tarot card
-  Column _buildCardCharacteristic(String characteristic, String value) {
+  Widget _buildCardCharacteristic(String characteristic, String value) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          characteristic,
-          style: Theme.of(context).textTheme.titleMedium!.copyWith(
-              color: Theme.of(context).colorScheme.onBackground,
-              fontWeight: FontWeight.bold),
+        FittedBox(
+          fit: BoxFit.fill,
+          child: Text(
+            characteristic,
+            style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.onBackground,
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
         ),
-        Text(
-          value,
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
+        Text(value, style: Theme.of(context).textTheme.bodyMedium!),
       ],
     );
   }
@@ -169,8 +183,12 @@ class _CardPageState extends State<CardPage> {
                     color: const Color(0xFF5E017D),
                     borderRadius: BorderRadius.circular(15)),
                 child: FittedBox(
-                  child: Image.network(taroCard.imagePath),
                   fit: BoxFit.fitHeight,
+                  child: Image.network(
+                    taroCard.imagePath,
+                    errorBuilder: ((context, error, stackTrace) =>
+                        const SizedBox()),
+                  ),
                 )),
           ),
           Container(
@@ -178,7 +196,7 @@ class _CardPageState extends State<CardPage> {
               child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(taroCard.cardName,
-                      style: Theme.of(context).textTheme.headline6))),
+                      style: Theme.of(context).textTheme.titleLarge))),
         ],
       ),
     );
