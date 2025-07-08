@@ -4,55 +4,66 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as p;
 import 'package:taro_cards/models/card_combination.dart';
 import '../models/card_value.dart';
-import '../models/taro_card.dart';
+import '../models/tarot_card.dart';
 
 ///database with tarot cards, its values and combinations
-class TaroCardsDatabase {
-  static final TaroCardsDatabase instance = TaroCardsDatabase._init();
-  static Database? _database;
-  TaroCardsDatabase._init();
+class TarotCardsDatabase {
+  static final TarotCardsDatabase instance = TarotCardsDatabase._internal();
 
-  ///gets an instance of a datebase
-  Future<Database?> get database async {
-    if (_database != null) return _database!;
-    _database = await _initDB("cards.db");
-    return _database;
-  }
+  factory TarotCardsDatabase() => instance;
 
-  ///initializes datebase
-  Future<Database> _initDB(String filePath) async {
+  TarotCardsDatabase._internal();
+
+  Database? _db;
+
+  ///initializes the database
+  Future<void> init() async {
     final dbPath = await getDatabasesPath();
-    final path = p.join(dbPath, filePath);
+    final path = p.join(dbPath, 'cards.db');
     await deleteDatabase(path);
     ByteData data = await rootBundle.load("assets/cards.db");
     List<int> bytes =
-        data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+        await data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
     await File(path).writeAsBytes(bytes);
-    return await openDatabase(path, version: 1);
+    _db = await openDatabase(
+      path,
+      version: 1,
+    );
   }
 
-  ///gets taro card by id
-  Future<TaroCard?> readTaroCard(int id) async {
-    final db = await instance.database;
-    final maps = await db!.query(
+  ///gets an instance of a database
+  Future<Database> get database async {
+    if (_db == null) {
+      throw Exception('Database not initialized. Call init(locale) first.');
+    }
+    return _db!;
+  }
+
+  ///gets tarot card by id
+  Future<TarotCard?> readTarotCard(int id, String locale) async {
+    final db = await database;
+    final maps = await db.query(
       tableTaroCards,
-      columns: TaroCardsFields.values,
-      where: '${TaroCardsFields.cardId} = ?',
+      columns:
+          locale == 'ru' ? TarotCardsFields.values : TarotCardsFields.valuesEn,
+      where: '${TarotCardsFields.cardId} = ?',
       whereArgs: [id],
     );
     if (maps.isNotEmpty) {
-      return TaroCard.fromJson(maps.first);
+      return TarotCard.fromJson(maps.first);
     } else {
       return null;
     }
   }
 
-  ///gets taro card's values by id
-  Future<List<CardValue?>> readTaroCardValues(int id) async {
-    final db = await instance.database;
+  ///gets tarot card's values by id
+  Future<List<CardValue?>> readTarotCardValues(int id, String locale) async {
+    final db = await database;
     List<dynamic> whereArguments = [id];
-    final result = await db!.query(
+    final result = await db.query(
       tableCardValues,
+      columns:
+          locale == 'ru' ? CardValuesFields.values : CardValuesFields.valuesEn,
       where: '${CardValuesFields.cardId} = ?',
       whereArgs: whereArguments,
     );
@@ -60,90 +71,56 @@ class TaroCardsDatabase {
   }
 
   ///gets all taro cards
-  Future<List<TaroCard>> readAllTaroCards() async {
-    final db = await instance.database;
-    final result = await db!.query(
+  Future<List<TarotCard>> readAllTaroCards(String locale) async {
+    final db = await database;
+    final result = await db.query(
       tableTaroCards,
+      columns:
+          locale == 'ru' ? TarotCardsFields.values : TarotCardsFields.valuesEn,
     );
-    return result.map((json) => TaroCard.fromJson(json)).toList();
+    return result.map((json) => TarotCard.fromJson(json)).toList();
   }
 
   ///gets the meaning of combination of two cards
-  Future<CardCombintaion?> readCombination(
-      TaroCard firstCard, TaroCard secondCard) async {
-    final db = await instance.database;
+  Future<CardCombination?> readCombination(
+      TarotCard firstCard, TarotCard secondCard, String locale) async {
+    final db = await database;
     List<dynamic> whereArguments = [firstCard.cardId, secondCard.cardId];
-    final result = await db!.query(
+    final result = await db.query(
       tableCardCombination,
+      columns: locale == 'ru'
+          ? CardCombinationFields.values
+          : CardCombinationFields.valuesEn,
       where:
           '${CardCombinationFields.firstCardId} = ? and ${CardCombinationFields.secondCardId} = ?',
       whereArgs: whereArguments,
     );
     if (result.isNotEmpty) {
-      return CardCombintaion.fromJson(result.first);
+      return CardCombination.fromJson(result.first);
     } else {
       return null;
     }
   }
 
-  ///gets all major arcana cards
-  Future<List<TaroCard>> readAllMajorArcana() async {
-    final db = await instance.database;
-    String whereString = '${TaroCardsFields.category} = ?';
-    String category = "Старшие арканы";
+  ///gets all cards by category
+  Future<List<TarotCard>> readAllCardsByCategory(
+      String category, String locale) async {
+    final db = await database;
+    String whereString =
+        '${locale == 'ru' ? TarotCardsFields.category : TarotCardsFields.categoryEn} = ?';
     List<dynamic> whereArguments = [category];
-    final result = await db!
-        .query(tableTaroCards, where: whereString, whereArgs: whereArguments);
-    return result.map((json) => TaroCard.fromJson(json)).toList();
-  }
-
-  ///gets all wands cards
-  Future<List<TaroCard>> readAllWands() async {
-    final db = await instance.database;
-    String whereString = '${TaroCardsFields.category} = ?';
-    String category = "Жезлы";
-    List<dynamic> whereArguments = [category];
-    final result = await db!
-        .query(tableTaroCards, where: whereString, whereArgs: whereArguments);
-    return result.map((json) => TaroCard.fromJson(json)).toList();
-  }
-
-  ///gets all cups cards
-  Future<List<TaroCard>> readAllCups() async {
-    final db = await instance.database;
-    String whereString = '${TaroCardsFields.category} = ?';
-    String category = "Кубки";
-    List<dynamic> whereArguments = [category];
-    final result = await db!
-        .query(tableTaroCards, where: whereString, whereArgs: whereArguments);
-    return result.map((json) => TaroCard.fromJson(json)).toList();
-  }
-
-  ///gets all swords cards
-  Future<List<TaroCard>> readAllSwords() async {
-    final db = await instance.database;
-    String whereString = '${TaroCardsFields.category} = ?';
-    String category = "Мечи";
-    List<dynamic> whereArguments = [category];
-    final result = await db!
-        .query(tableTaroCards, where: whereString, whereArgs: whereArguments);
-    return result.map((json) => TaroCard.fromJson(json)).toList();
-  }
-
-  ///gets all pentacles cards
-  Future<List<TaroCard>> readAllPentacles() async {
-    final db = await instance.database;
-    String whereString = '${TaroCardsFields.category} = ?';
-    String category = "Пентакли";
-    List<dynamic> whereArguments = [category];
-    final result = await db!
-        .query(tableTaroCards, where: whereString, whereArgs: whereArguments);
-    return result.map((json) => TaroCard.fromJson(json)).toList();
+    final result = await db.query(tableTaroCards,
+        columns: locale == 'ru'
+            ? TarotCardsFields.values
+            : TarotCardsFields.valuesEn,
+        where: whereString,
+        whereArgs: whereArguments);
+    return result.map((json) => TarotCard.fromJson(json)).toList();
   }
 
   //closes db
   Future close() async {
     final db = await instance.database;
-    db!.close();
+    db.close();
   }
 }

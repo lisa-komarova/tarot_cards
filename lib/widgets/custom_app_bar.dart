@@ -33,53 +33,58 @@ class _CustomAppBarState extends State<CustomAppBar> {
         color: Colors.transparent,
         child: Stack(fit: StackFit.loose, children: <Widget>[
           Align(
-              alignment: const Alignment(0.0, 1.25),
+            alignment: const Alignment(0.0, 1.25),
+            child: Container(
+              height: MediaQuery.of(context).size.height / 10.5,
+              padding: const EdgeInsets.only(left: 20, right: 20),
               child: Container(
-                  height: MediaQuery.of(context).size.height / 10.5,
-                  padding: const EdgeInsets.only(left: 30, right: 30),
-                  child: Container(
-                      decoration: const BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 20.0,
-                            // shadow
-                            spreadRadius: .5,
-                            // set effect of extending the shadow
-                            offset: Offset(
-                              0.0,
-                              5.0,
-                            ),
-                          )
-                        ],
+                decoration: const BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 20.0,
+                      // shadow
+                      spreadRadius: .5,
+                      // set effect of extending the shadow
+                      offset: Offset(
+                        0.0,
+                        5.0,
                       ),
-                      child: TextField(
-                          controller: widget.controller,
-                          style: Theme.of(context).textTheme.titleLarge,
-                          cursorHeight: 0,
-                          cursorWidth: 0,
-                          focusNode: myFocusNode,
-                          onChanged: (searchText) {
-                            widget.searchHandler(searchText);
-                          },
-                          onTap: () => myFocusNode.requestFocus(),
-                          decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.white,
-                              suffixIcon: const Icon(
-                                Icons.search,
-                                color: Colors.black38,
-                              ),
-                              contentPadding:
-                                  const EdgeInsets.only(left: 30, bottom: 30),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                      color: Colors.white, width: 1),
-                                  borderRadius: BorderRadius.circular(35)),
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                      color: Colors.white, width: 1),
-                                  borderRadius: BorderRadius.circular(35))))))),
+                    )
+                  ],
+                ),
+                child: TextField(
+                  controller: widget.controller,
+                  style: Theme.of(context).textTheme.titleLarge,
+                  cursorHeight: 0,
+                  cursorWidth: 0,
+                  focusNode: myFocusNode,
+                  onChanged: (searchText) {
+                    widget.searchHandler(searchText);
+                  },
+                  onTap: () => myFocusNode.requestFocus(),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    suffixIcon: const Icon(
+                      Icons.search,
+                      color: Colors.black38,
+                    ),
+                    contentPadding: const EdgeInsets.only(left: 30, bottom: 30),
+                    focusedBorder: OutlineInputBorder(
+                        borderSide:
+                            const BorderSide(color: Colors.white, width: 1),
+                        borderRadius: BorderRadius.circular(35)),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide:
+                          const BorderSide(color: Colors.white, width: 1),
+                      borderRadius: BorderRadius.circular(35),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ]));
   }
 }

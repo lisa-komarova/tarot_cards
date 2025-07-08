@@ -8,12 +8,22 @@ class CardValuesFields {
     upward,
     downward,
   ];
+  static final List<String> valuesEn = [
+    cardValueId,
+    valueNameEn,
+    cardId,
+    upwardEn,
+    downwardEn,
+  ];
 
   static const cardValueId = 'cardValueId';
   static const valueName = 'valueName';
+  static const valueNameEn = 'valueNameEn';
   static const cardId = 'cardID';
   static const upward = 'upward';
   static const downward = 'downward';
+  static const upwardEn = 'upwardEn';
+  static const downwardEn = 'downwardEn';
 }
 
 ///card values model, represents the meaning of a card in different situations
@@ -38,16 +48,21 @@ class CardValue {
         CardValuesFields.downward: downward
       };
   static CardValue fromJson(Map<String, Object?> json) {
-    String upward = "";
-    if (json[CardValuesFields.downward] != null) {
-      upward = json[CardValuesFields.downward] as String;
-    }
     return CardValue(
-        cardValueId: json[CardValuesFields.cardValueId] as int,
-        valueName: json[CardValuesFields.valueName] as String,
-        cardId: json[CardValuesFields.cardId] as int,
-        upward: json[CardValuesFields.upward] as String,
-        downward: upward);
+      cardValueId: json[CardValuesFields.cardValueId] as int,
+      valueName: json[CardValuesFields.valueName] != null
+          ? json[CardValuesFields.valueName] as String
+          : json[CardValuesFields.valueNameEn] as String,
+      cardId: json[CardValuesFields.cardId] as int,
+      upward: json[CardValuesFields.upward] != null
+          ? json[CardValuesFields.upward] as String
+          : json[CardValuesFields.upwardEn] as String,
+      downward: json[CardValuesFields.downward] != null
+          ? json[CardValuesFields.downward] as String
+          : json[CardValuesFields.downwardEn] != null
+              ? json[CardValuesFields.downwardEn] as String
+              : '',
+    );
   }
 
   CardValue copy(

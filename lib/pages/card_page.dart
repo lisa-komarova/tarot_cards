@@ -1,13 +1,18 @@
-import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:taro_cards/bloc/tarot_card_event.dart';
+import 'package:taro_cards/bloc/tarot_card_state.dart';
 import 'package:taro_cards/models/card_value.dart';
-import 'package:taro_cards/models/taro_card.dart';
+import 'package:taro_cards/models/tarot_card.dart';
 import 'package:taro_cards/widgets/ad_widget.dart';
 import 'package:taro_cards/widgets/card_value_button_animated.dart';
 import 'package:taro_cards/widgets/combination_widget.dart';
 import 'package:taro_cards/widgets/source_widget.dart';
 
-import '../database/cards_database.dart';
+import '../bloc/locale_bloc.dart';
+import '../bloc/tarot_card_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 ///cardpage widget is for displaying tarot card and its values
 class CardPage extends StatefulWidget {
@@ -20,35 +25,51 @@ class CardPage extends StatefulWidget {
 }
 
 class _CardPageState extends State<CardPage> {
-  late TaroCard taroCard;
+  late TarotCard taroCard;
   late CardValue cardValue;
-  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    getTaroCard();
+    // getTaroCard();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Container(
-        color: Theme.of(context).colorScheme.background,
-        width: double.infinity,
-        child: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : buildTaroCard(),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        context.read<TarotCardBloc>().add(LoadCardsByCategory(
+            taroCard.category, context.read<LocaleBloc>().state.languageCode));
+        Navigator.of(context).pop();
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: SafeArea(
+        child: Container(
+          color: Theme.of(context).colorScheme.background,
+          width: double.infinity,
+          child: BlocBuilder<TarotCardBloc, TarotCardState>(
+              builder: (context, state) {
+            if (state is TarotCardLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is TarotCardDetailFullLoaded) {
+              taroCard = state.card;
+              return buildTaroCard();
+            } else {
+              return SizedBox.shrink();
+            }
+          }),
+        ),
       ),
     );
   }
 
   ///reads tarot card from db
   Future getTaroCard() async {
-    taroCard = (await TaroCardsDatabase.instance.readTaroCard(widget.cardId))!;
-    setState(() {
-      isLoading = false;
-    });
+    context.read<TarotCardBloc>().add(LoadTarotCardWithValues(
+        widget.cardId, context.read<LocaleBloc>().state.languageCode));
+    //taroCard = (await TarotCardsDatabase().readTarotCard(widget.cardId))!;
   }
 
   ///builds tarot card, its values and combination of the card with other cards
@@ -86,16 +107,22 @@ class _CardPageState extends State<CardPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildCardCharacteristic(
-                                "НАЗВАНИЕ\nАРКАНА: ", taroCard.cardName),
+                                AppLocalizations.of(context).cardName,
+                                taroCard.cardName),
                             _buildCardCharacteristic(
-                                "КАТЕГОРИЯ: ", taroCard.category),
-                            if (taroCard.category == "Старшие арканы")
-                              _buildCardCharacteristic("НОМЕР АРКАНА: ",
+                                AppLocalizations.of(context).category,
+                                taroCard.category),
+                            if (taroCard.category ==
+                                AppLocalizations.of(context).majorArcana)
+                              _buildCardCharacteristic(
+                                  AppLocalizations.of(context).number,
                                   (taroCard.cardId - 1).toString()),
                             _buildCardCharacteristic(
-                                "ПРЯМОЕ\nПОЛОЖЕНИЕ: ", taroCard.upward),
+                                AppLocalizations.of(context).uprigthCapital,
+                                taroCard.upward),
                             _buildCardCharacteristic(
-                                "ПЕРЕВЕРНУТОЕ\nПОЛОЖЕНИЕ: ", taroCard.downward),
+                                AppLocalizations.of(context).reversedCapital,
+                                taroCard.downward),
                           ],
                         ),
                       ),
@@ -108,27 +135,31 @@ class _CardPageState extends State<CardPage> {
           Column(
             children: [
               CardValueButtonAnimated(
-                title: "Общее значение",
+                title: AppLocalizations.of(context).theGeneralMeaning,
                 taroCard: taroCard,
               ),
               CardValueButtonAnimated(
-                title: "Значение в любви и отношениях",
+                title: AppLocalizations.of(context).loveMeaning,
                 taroCard: taroCard,
               ),
               CardValueButtonAnimated(
-                title: "В ситуации и вопросе",
+                title: AppLocalizations.of(context).situationOrQuestion,
                 taroCard: taroCard,
               ),
               CardValueButtonAnimated(
-                title: "Значение карты дня",
+                title: AppLocalizations.of(context).health,
                 taroCard: taroCard,
               ),
               CardValueButtonAnimated(
-                title: "Совет карты",
+                title: AppLocalizations.of(context).cardOfTheDay,
                 taroCard: taroCard,
               ),
               CardValueButtonAnimated(
-                title: "Значение да/нет",
+                title: AppLocalizations.of(context).advice,
+                taroCard: taroCard,
+              ),
+              CardValueButtonAnimated(
+                title: AppLocalizations.of(context).yesOrNo,
                 taroCard: taroCard,
               ),
               CombinationWidget(
@@ -183,13 +214,11 @@ class _CardPageState extends State<CardPage> {
                     color: const Color(0xFF5E017D),
                     borderRadius: BorderRadius.circular(15)),
                 child: FittedBox(
-                  fit: BoxFit.fitHeight,
-                  child: Image.network(
-                    taroCard.imagePath,
-                    errorBuilder: ((context, error, stackTrace) =>
-                        const SizedBox()),
-                  ),
-                )),
+                    fit: BoxFit.fitHeight,
+                    child: CachedNetworkImage(
+                      imageUrl: taroCard.imagePath,
+                      errorWidget: (context, url, error) => const SizedBox(),
+                    ))),
           ),
           Container(
               padding: const EdgeInsets.only(left: 10, bottom: 5),

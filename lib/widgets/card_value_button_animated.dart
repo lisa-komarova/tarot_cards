@@ -1,17 +1,19 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taro_cards/models/card_value.dart';
-import 'package:taro_cards/models/taro_card.dart';
+import 'package:taro_cards/models/tarot_card.dart';
 import 'package:taro_cards/widgets/card_value_widget.dart';
 
+import '../bloc/locale_bloc.dart';
 import '../database/cards_database.dart';
 
 ///widget for showing and hiding value of a card
 class CardValueButtonAnimated extends StatefulWidget {
   ///situation in which card is read (meaning in love, card of a day etc)
   final String title;
-  final TaroCard taroCard;
+  final TarotCard taroCard;
   const CardValueButtonAnimated(
       {super.key, required this.title, required this.taroCard});
   @override
@@ -61,8 +63,8 @@ class _CardValueButtonAnimatedState extends State<CardValueButtonAnimated>
   Future getTaroCardValue() async {
     setState(() => isLoading = true);
 
-    cardValues = (await TaroCardsDatabase.instance
-        .readTaroCardValues(widget.taroCard.cardId));
+    cardValues = (await TarotCardsDatabase.instance.readTarotCardValues(
+        widget.taroCard.cardId, context.read<LocaleBloc>().state.languageCode));
 
     setState(() => isLoading = false);
   }

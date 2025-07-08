@@ -1,7 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+///A widget that represent a link to a source of info
 class SourceWidget extends StatelessWidget {
   final String url;
   const SourceWidget({
@@ -19,7 +21,7 @@ class SourceWidget extends StatelessWidget {
           text: TextSpan(
               recognizer: TapGestureRecognizer()
                 ..onTap = (() => {launchUrl(Uri.parse(url))}),
-              text: "Источник",
+              text: AppLocalizations.of(context).source,
               style: Theme.of(context)
                   .textTheme
                   .titleLarge!

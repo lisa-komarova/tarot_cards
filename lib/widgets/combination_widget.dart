@@ -1,15 +1,18 @@
 import 'dart:math';
-
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taro_cards/database/cards_database.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:taro_cards/models/card_combination.dart';
-import 'package:taro_cards/models/taro_card.dart';
+import 'package:taro_cards/models/tarot_card.dart';
 
-///builds drop-down list of cards and the meaning of
-///combination with a chosen card from the drop-down-list
+import '../bloc/locale_bloc.dart';
+
+///builds two cards and their combination meaning
+///the second card is chosen in a dialog
 class CombinationWidget extends StatefulWidget {
-  final TaroCard taroCard;
+  final TarotCard taroCard;
+
   const CombinationWidget({super.key, required this.taroCard});
 
   @override
@@ -23,10 +26,12 @@ class _CombinationWidgetState extends State<CombinationWidget>
   late final _controller = AnimationController(vsync: this);
   bool visibility = false;
   bool isLoading = true;
-  late TaroCard _secondCard;
-  List<TaroCard> _taroCards = [];
-  late final Future<List<TaroCard>> _loadedTaroCards;
-  late CardCombintaion _cardCombintaion;
+  late TarotCard _secondCard;
+  List<TarotCard> _taroCards = [];
+  late final Future<List<TarotCard>> _loadedTaroCards;
+  late CardCombination _cardCombintaion;
+  final TextEditingController _searchController = TextEditingController();
+
   void _toggleCard() {
     setState(() => visibility = !visibility);
     switch (_controller.status) {
@@ -54,6 +59,7 @@ class _CombinationWidgetState extends State<CombinationWidget>
   @override
   void dispose() {
     _controller.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -68,8 +74,10 @@ class _CombinationWidgetState extends State<CombinationWidget>
 
   ///gets the meaning of the combination of two cards
   void _readCardCombination() async {
-    var cardCombintaion = (await TaroCardsDatabase.instance
-        .readCombination(widget.taroCard, _secondCard))!;
+    var cardCombintaion = (await TarotCardsDatabase.instance.readCombination(
+        widget.taroCard,
+        _secondCard,
+        context.read<LocaleBloc>().state.languageCode))!;
     setState(() {
       _cardCombintaion = cardCombintaion;
     });
@@ -78,9 +86,10 @@ class _CombinationWidgetState extends State<CombinationWidget>
   ///gets the list of cards for drop-down list
   ///sets the default second card
   ///and the combination with the second card
-  Future<List<TaroCard>> _readTaroCards() async {
-    final List<TaroCard> allTaroCards =
-        await TaroCardsDatabase.instance.readAllTaroCards();
+  Future<List<TarotCard>> _readTaroCards() async {
+    final locale = context.read<LocaleBloc>().state;
+    final List<TarotCard> allTaroCards =
+        await TarotCardsDatabase.instance.readAllTaroCards(locale.languageCode);
     allTaroCards.removeWhere((item) => item.cardId == widget.taroCard.cardId);
     _secondCard = allTaroCards.first;
     _readCardCombination();
@@ -98,6 +107,7 @@ class _CombinationWidgetState extends State<CombinationWidget>
       });
       _readCardCombination();
     }
+    Navigator.of(context).pop();
   }
 
   @override
@@ -108,7 +118,7 @@ class _CombinationWidgetState extends State<CombinationWidget>
           future: _loadedTaroCards,
           builder: ((context, snapshot) {
             if (snapshot.data != null) {
-              _taroCards = snapshot.data as List<TaroCard>;
+              _taroCards = snapshot.data as List<TarotCard>;
               List<String> taroCardsNames = [];
               for (var card in _taroCards) {
                 taroCardsNames.add(card.cardName);
@@ -149,7 +159,7 @@ class _CombinationWidgetState extends State<CombinationWidget>
                 children: [
                   Expanded(
                     child: Text(
-                      'Расcчитать комбинации',
+                      AppLocalizations.of(context).combinationOfTwoCards,
                       style: Theme.of(context).textTheme.titleLarge,
                       textAlign: TextAlign.center,
                     ),
@@ -168,68 +178,225 @@ class _CombinationWidgetState extends State<CombinationWidget>
         ),
       ),
       if (visibility)
-        Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.only(top: 18, right: 18, left: 18),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: DropdownSearch(
-                      popupProps: PopupProps.dialog(
-                        showSearchBox: true,
-                        searchFieldProps: TextFieldProps(
-                            decoration: InputDecoration(
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(
-                              width: 1,
-                            ),
-                            borderRadius: BorderRadius.circular(25.0),
-                          ),
-                        )),
-                        emptyBuilder: (context, searchEntry) => const Center(
-                          child: Text('Нет такой карты ˙◠˙'),
-                        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SizedBox(
+            height: 300,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 10.0),
+                      child: Text(
+                        AppLocalizations.of(context).firstCard,
+                        textAlign: TextAlign.start,
                       ),
-                      items: taroCardsNames,
-                      dropdownDecoratorProps: DropDownDecoratorProps(
-                          dropdownSearchDecoration: InputDecoration(
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        errorBorder: InputBorder.none,
-                        disabledBorder: InputBorder.none,
-                        label: Text(
-                          "Вторая карта",
+                    ),
+                    Container(
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                      ),
+                      child: Center(
+                        child: Text(
+                          widget.taroCard.cardName,
+                          textAlign: TextAlign.center,
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
-                      )),
-                      onChanged: _changeSecondCard,
-                      selectedItem: _secondCard.cardName,
+                      ),
                     ),
-                  )
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 18, right: 18, left: 18),
-              child: isLoading
-                  ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : SizedBox(
-                      width: double.infinity,
-                      child: Text('Значение: ${_cardCombintaion.value}',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge!
-                              .copyWith(fontSize: 18)),
+                  ],
+                ),
+                Image.asset(
+                  'assets/icons/add.png',
+                  width: 25,
+                  height: 25,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    _buildCardCombinationDialog(
+                        context, taroCardsNames, _secondCard);
+                  },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10.0),
+                        child: Text(AppLocalizations.of(context).secondCard),
+                      ),
+                      Container(
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                        ),
+                        child: Center(
+                          child: Text(
+                            _secondCard.cardName,
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Image.asset(
+                  'assets/icons/equals.png',
+                  width: 25,
+                  height: 25,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 10.0),
+                      child: Text(AppLocalizations.of(context).meaning),
                     ),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        minHeight: 50.0,
+                      ),
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(horizontal: 5),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                        ),
+                        child: Center(
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.vertical,
+                            child: Text(
+                              _cardCombintaion.value,
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
         )
     ]);
+  }
+
+  Future<void> _buildCardCombinationDialog(
+      BuildContext context, List<String> taroCardsNames, TarotCard secondCard) {
+    List<String> duplicateTaroCardsNames = [];
+    duplicateTaroCardsNames.addAll(taroCardsNames);
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+          return SizedBox(
+            height: 500,
+            width: 250,
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 50,
+                  child: TextField(
+                    onChanged: (searchText) {
+                      List<String> dummySearchList = [];
+                      dummySearchList.addAll(duplicateTaroCardsNames);
+                      if (searchText.isNotEmpty) {
+                        List<String> dummyListData = [];
+                        for (var item in dummySearchList) {
+                          if (item.toLowerCase().contains(searchText)) {
+                            dummyListData.add(item);
+                          }
+                        }
+                        setState(() {
+                          taroCardsNames.clear();
+                          taroCardsNames.addAll(dummyListData);
+                        });
+                        return;
+                      } else {
+                        setState(() {
+                          taroCardsNames.clear();
+                          taroCardsNames.addAll(duplicateTaroCardsNames);
+                        });
+                      }
+                    },
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      suffixIcon: const Icon(
+                        Icons.search,
+                        color: Colors.black38,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              const BorderSide(color: Colors.white, width: 1),
+                          borderRadius: BorderRadius.circular(35)),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            const BorderSide(color: Colors.white, width: 1),
+                        borderRadius: BorderRadius.circular(35),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: SizedBox(
+                      height: 450,
+                      child: taroCardsNames.isEmpty
+                          ? Center(
+                              child: Text(
+                                AppLocalizations.of(context).noSuchCards,
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                            )
+                          : ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: taroCardsNames.length,
+                              itemBuilder: (ctx, index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    _changeSecondCard(taroCardsNames[index]);
+                                  },
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: SizedBox(
+                                            height: 30,
+                                            child: Text(
+                                              taroCardsNames[index],
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleMedium,
+                                            )),
+                                      ),
+                                      Image.asset(
+                                        'assets/icons/divider.png',
+                                        width: 10,
+                                        height: 10,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          );
+        }));
+      },
+    );
   }
 }

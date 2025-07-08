@@ -1,12 +1,22 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:taro_cards/models/taro_card.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:taro_cards/models/tarot_card.dart';
 import 'package:yandex_mobileads/mobile_ads.dart';
+import '../bloc/locale_bloc.dart';
+import '../bloc/tarot_card_bloc.dart';
+import '../bloc/tarot_card_event.dart';
 import '../pages/card_page.dart';
 
 ///builds grid view with tarot cards
 class TaroCardsList extends StatefulWidget {
-  final List<TaroCard> taroCards;
-  const TaroCardsList({super.key, required this.taroCards});
+  final List<TarotCard> taroCards;
+  final TextEditingController editingController;
+
+  const TaroCardsList(
+      {super.key, required this.taroCards, required this.editingController});
+
   @override
   State createState() => _CardPageListState();
 }
@@ -14,7 +24,7 @@ class TaroCardsList extends StatefulWidget {
 class _CardPageListState extends State<TaroCardsList> {
   InterstitialAd? _interstitialAd;
   late final Future<InterstitialAdLoader> _adLoader;
-  int numberOfCardsOpened = 0;
+  static const _keyCards = 'numberOfCardsOpened';
 
   @override
   Widget build(BuildContext context) {
@@ -41,15 +51,16 @@ class _CardPageListState extends State<TaroCardsList> {
       itemCount: widget.taroCards.length,
       itemBuilder: (BuildContext ctx, index) {
         return GestureDetector(
-          onTap: (() {
-            numberOfCardsOpened++;
-            if (numberOfCardsOpened > 1) {
-              numberOfCardsOpened = 0;
+          onTap: (() async {
+            incrementCardsShown();
+            final number = await getNumberOfCardsShown();
+            if (number % 3 == 0) {
               _loadInterstitialAd();
               if (_interstitialAd != null) {
                 _interstitialAd?.show();
               }
             }
+            widget.editingController.clear();
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -57,6 +68,9 @@ class _CardPageListState extends State<TaroCardsList> {
                     CardPage(cardId: widget.taroCards[index].cardId),
               ),
             );
+            context.read<TarotCardBloc>().add(LoadTarotCardWithValues(
+                widget.taroCards[index].cardId,
+                context.read<LocaleBloc>().state.languageCode));
           }),
           child: Container(
             margin: const EdgeInsets.all(10),
@@ -75,13 +89,13 @@ class _CardPageListState extends State<TaroCardsList> {
                           color: const Color(0xFF5E017D),
                           borderRadius: BorderRadius.circular(15)),
                       child: FittedBox(
-                        fit: BoxFit.fitHeight,
-                        child: Image.network(
-                          widget.taroCards[index].imagePath,
-                          errorBuilder: ((context, error, stackTrace) =>
-                              const SizedBox()),
-                        ),
-                      )),
+                          fit: BoxFit.fitHeight,
+                          child: CachedNetworkImage(
+                            imageUrl: widget.taroCards[index].imagePath,
+                            errorWidget: (ctx, _, __) {
+                              return SizedBox();
+                            },
+                          ))),
                 ),
                 Container(
                     padding: const EdgeInsets.only(left: 10, bottom: 5),
@@ -95,24 +109,36 @@ class _CardPageListState extends State<TaroCardsList> {
         );
       });
 
+  ///creates an ad
   Future<InterstitialAdLoader> _createInterstitialAdLoader() {
     return InterstitialAdLoader.create(
       onAdLoaded: (InterstitialAd interstitialAd) {
-        // The ad was loaded successfully. Now you can show loaded ad
         _interstitialAd = interstitialAd;
-      },
-      onAdFailedToLoad: (error) {
-        // Ad failed to load with AdRequestError.
-        // Attempting to load a new ad from the onAdFailedToLoad() method is strongly discouraged.
       },
     );
   }
 
+  ///loads an ad
   Future<void> _loadInterstitialAd() async {
     final adLoader = await _adLoader;
     await adLoader.loadAd(
         adRequestConfiguration: const AdRequestConfiguration(
             adUnitId:
-                'R-M-3620673-2')); // for debug you can use 'demo-interstitial-yandex'
+                'R-M-14552552-2')); // for debug you can use 'demo-interstitial-yandex'R-M-14552552-2
+  }
+
+  static Future<void> setNumberOfCardsShown(int value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_keyCards, value);
+  }
+
+  static Future<int> getNumberOfCardsShown() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_keyCards) ?? 0;
+  }
+
+  static Future<void> incrementCardsShown() async {
+    final current = await getNumberOfCardsShown();
+    await setNumberOfCardsShown(current + 1);
   }
 }

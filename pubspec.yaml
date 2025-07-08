@@ -15,7 +15,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 2.2.2+10
+version: 2.4.0+22
 
 environment:
   sdk: ">=2.17.6 <3.0.0"
@@ -29,47 +29,51 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  flutter_native_splash: ^2.1.6
   sqflite: ^2.0.2+1
   url_launcher: ^6.1.6
-  dropdown_search: ^5.0.6
+  dropdown_search: ^6.0.2
   google_fonts: ^6.1.0
-  yandex_mobileads: ^7.0.1
+  yandex_mobileads: ^7.13.0
   auto_size_text: ^3.0.0
-  
-flutter_native_splash:
-  color: "#E1ACFF"
-  image: assets/splash_image.png
-  
+  cached_network_image: ^3.3.1
+  internet_connection_checker_plus: ^2.2.0
+  flutter_native_splash: ^2.3.11
+  equatable: ^2.0.7
+  flutter_bloc: ^9.1.1
+  shared_preferences: ^2.5.3
+
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: ^0.13.1
-
+#flutter_launcher_icons:
+#  android: "launcher_icon"
+#  ios: true
+#  image_path: "assets/icon/launcher_icon.png"
+flutter_native_splash:
+  color: "#E1ACFF"
+  image: assets/splash_image.png
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^4.0.0
+flutter_lints: ^4.0.0
 
-flutter_icons:
-  android: "launcher_icon"
-  ios: true
-  image_path: "assets/icons/icon.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter.
 flutter:
-
+  generate: true
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -89,6 +93,8 @@ flutter:
     - assets/icons/wands_grey.png
     - assets/icons/wands_purple.png
     - assets/icons/divider.png
+    - assets/icons/add.png
+    - assets/icons/equals.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
@@ -108,3 +114,5 @@ flutter:
         - asset: assets/OpenSans-SemiBold.ttf
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+flutter_intl:
+  enabled: true
