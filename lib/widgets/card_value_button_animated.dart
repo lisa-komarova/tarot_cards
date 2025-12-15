@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,34 +24,20 @@ class CardValueButtonAnimated extends StatefulWidget {
 class _CardValueButtonAnimatedState extends State<CardValueButtonAnimated>
     with SingleTickerProviderStateMixin {
   static const _color = Colors.white;
-
-  late final _controller = AnimationController(vsync: this);
-  bool visibility = false;
   bool isLoading = true;
   List<CardValue?>? cardValues = [];
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 300),
+  );
 
+  ///controls whether the value is shown
   void _toggleCard() {
-    setState(() => visibility = !visibility);
-    switch (_controller.status) {
-      case AnimationStatus.dismissed:
-        _controller.forward();
-        break;
-      case AnimationStatus.forward:
-        _controller.reverse();
-        break;
-      case AnimationStatus.reverse:
-        _controller.forward();
-        break;
-      case AnimationStatus.completed:
-        _controller.reverse();
-        break;
+    if (_controller.isDismissed) {
+      _controller.forward();
+    } else {
+      _controller.reverse();
     }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _controller.duration = const Duration(milliseconds: 500);
   }
 
   @override
@@ -86,51 +73,52 @@ class _CardValueButtonAnimatedState extends State<CardValueButtonAnimated>
             child: AnimatedBuilder(
               animation: _controller,
               builder: (_, __) => Container(
-                alignment: Alignment.center,
-                width: double.infinity,
                 height: 60,
-                decoration: DecorationTween(
-                  begin: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                    color: _color,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: _color.withOpacity(
+                    lerpDouble(1, 0.4, _controller.value)!,
                   ),
-                  end: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(20)),
-                    color: _color.withOpacity(0.4),
-                  ),
-                ).evaluate(_controller),
+                ),
                 child: Row(
                   children: [
                     Expanded(
-                        child: Text(
-                      widget.title,
-                      style: Theme.of(context).textTheme.titleLarge,
-                      textAlign: TextAlign.center,
-                    )),
+                      child: Text(
+                        widget.title,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                    ),
                     Transform.rotate(
-                        angle: Tween(begin: 0.0, end: pi).evaluate(_controller),
-                        child: const Icon(
-                          Icons.arrow_drop_up,
-                          color: Color(0xFF5E017D),
-                          size: 60,
-                        )),
+                      angle: pi * _controller.value,
+                      child: const Icon(
+                        Icons.arrow_drop_up,
+                        color: Color(0xFF5E017D),
+                        size: 60,
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
           ),
         ),
-        if (visibility)
-          SingleChildScrollView(
-            child: Container(
-                alignment: Alignment.center,
-                child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: CardValueWidget(
-                      title: widget.title,
-                      cardValues: cardValues,
-                    ))),
-          )
+        SizeTransition(
+          sizeFactor: CurvedAnimation(
+            parent: _controller,
+            curve: Curves.easeInOut,
+          ),
+          axisAlignment: -1,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: isLoading
+                ? const CircularProgressIndicator()
+                : CardValueWidget(
+                    title: widget.title,
+                    cardValues: cardValues,
+                  ),
+          ),
+        ),
       ],
     );
   }

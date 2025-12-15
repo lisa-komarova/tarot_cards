@@ -12,7 +12,7 @@ import 'package:taro_cards/widgets/source_widget.dart';
 
 import '../bloc/locale_bloc.dart';
 import '../bloc/tarot_card_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../l10n/app_localizations.dart';
 
 ///cardpage widget is for displaying tarot card and its values
 class CardPage extends StatefulWidget {

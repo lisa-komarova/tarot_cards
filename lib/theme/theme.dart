@@ -10,7 +10,7 @@ final lightTheme = ThemeData(
       titleLarge: TextStyle(fontSize: 20.0, color: Colors.black),
       headlineSmall: TextStyle(fontSize: 6.0, color: Colors.purple),
     ),
-    bottomAppBarTheme: const BottomAppBarTheme(color: Colors.transparent),
+    bottomAppBarTheme: const BottomAppBarThemeData(color: Colors.transparent),
     colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.purple)
         .copyWith(background: Colors.purple.shade100));
 

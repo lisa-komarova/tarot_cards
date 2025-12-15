@@ -2,11 +2,11 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taro_cards/database/cards_database.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:taro_cards/models/card_combination.dart';
 import 'package:taro_cards/models/tarot_card.dart';
 
 import '../bloc/locale_bloc.dart';
+import '../l10n/app_localizations.dart';
 
 ///builds two cards and their combination meaning
 ///the second card is chosen in a dialog
@@ -23,8 +23,11 @@ class _CombinationWidgetState extends State<CombinationWidget>
     with SingleTickerProviderStateMixin {
   static const _color = Colors.white;
 
-  late final _controller = AnimationController(vsync: this);
-  bool visibility = false;
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 300),
+  );
+
   bool isLoading = true;
   late TarotCard _secondCard;
   List<TarotCard> _taroCards = [];
@@ -32,28 +35,13 @@ class _CombinationWidgetState extends State<CombinationWidget>
   late CardCombination _cardCombintaion;
   final TextEditingController _searchController = TextEditingController();
 
+  ///controls whether the combination is shown
   void _toggleCard() {
-    setState(() => visibility = !visibility);
-    switch (_controller.status) {
-      case AnimationStatus.dismissed:
-        _controller.forward();
-        break;
-      case AnimationStatus.forward:
-        _controller.reverse();
-        break;
-      case AnimationStatus.reverse:
-        _controller.forward();
-        break;
-      case AnimationStatus.completed:
-        _controller.reverse();
-        break;
+    if (_controller.isDismissed) {
+      _controller.forward();
+    } else {
+      _controller.reverse();
     }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _controller.duration = const Duration(milliseconds: 500);
   }
 
   @override
@@ -142,43 +130,42 @@ class _CombinationWidgetState extends State<CombinationWidget>
           child: AnimatedBuilder(
             animation: _controller,
             builder: (_, __) => Container(
-              alignment: Alignment.center,
-              width: double.infinity,
               height: 60,
-              decoration: DecorationTween(
-                begin: const BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                  color: _color,
-                ),
-                end: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(15)),
-                  color: _color.withOpacity(0.4),
-                ),
-              ).evaluate(_controller),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: Color.lerp(
+                    _color, _color.withOpacity(0.4), _controller.value),
+              ),
               child: Row(
                 children: [
                   Expanded(
                     child: Text(
                       AppLocalizations.of(context).combinationOfTwoCards,
-                      style: Theme.of(context).textTheme.titleLarge,
                       textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.titleLarge,
                     ),
                   ),
                   Transform.rotate(
-                      angle: Tween(begin: 0.0, end: pi).evaluate(_controller),
-                      child: const Icon(
-                        Icons.arrow_drop_up,
-                        color: Color(0xFF5E017D),
-                        size: 60,
-                      )),
+                    angle: pi * _controller.value,
+                    child: const Icon(
+                      Icons.arrow_drop_up,
+                      color: Color(0xFF5E017D),
+                      size: 60,
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
         ),
       ),
-      if (visibility)
-        Padding(
+      SizeTransition(
+        sizeFactor: CurvedAnimation(
+          parent: _controller,
+          curve: Curves.easeInOut,
+        ),
+        axisAlignment: -1,
+        child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: SizedBox(
             height: 300,
@@ -186,6 +173,7 @@ class _CombinationWidgetState extends State<CombinationWidget>
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // Первая карточка
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -198,7 +186,7 @@ class _CombinationWidgetState extends State<CombinationWidget>
                     ),
                     Container(
                       height: 50,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.all(Radius.circular(15)),
                       ),
@@ -217,6 +205,7 @@ class _CombinationWidgetState extends State<CombinationWidget>
                   width: 25,
                   height: 25,
                 ),
+                // Вторая карточка
                 GestureDetector(
                   onTap: () {
                     _buildCardCombinationDialog(
@@ -231,7 +220,7 @@ class _CombinationWidgetState extends State<CombinationWidget>
                       ),
                       Container(
                         height: 50,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.all(Radius.circular(15)),
                         ),
@@ -251,6 +240,7 @@ class _CombinationWidgetState extends State<CombinationWidget>
                   width: 25,
                   height: 25,
                 ),
+                // Значение комбинации
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -264,8 +254,8 @@ class _CombinationWidgetState extends State<CombinationWidget>
                       ),
                       child: Container(
                         width: double.infinity,
-                        padding: EdgeInsets.symmetric(horizontal: 5),
-                        decoration: BoxDecoration(
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        decoration: const BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.all(Radius.circular(15)),
                         ),
@@ -286,10 +276,13 @@ class _CombinationWidgetState extends State<CombinationWidget>
               ],
             ),
           ),
-        )
+        ),
+      )
     ]);
   }
 
+  ///builds the dialog with the list of
+  ///available cards to choose as a second card
   Future<void> _buildCardCombinationDialog(
       BuildContext context, List<String> taroCardsNames, TarotCard secondCard) {
     List<String> duplicateTaroCardsNames = [];

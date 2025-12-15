@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:taro_cards/models/card_value.dart';
 import 'package:taro_cards/widgets/source_widget.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+import '../l10n/app_localizations.dart';
 
 ///builds text with the value of a card
 class CardValueWidget extends StatefulWidget {

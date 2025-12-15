@@ -124,19 +124,22 @@ class _CardPageListState extends State<TaroCardsList> {
     await adLoader.loadAd(
         adRequestConfiguration: const AdRequestConfiguration(
             adUnitId:
-                'R-M-14552552-2')); // for debug you can use 'demo-interstitial-yandex'R-M-14552552-2
+                'demo-interstitial-yandex')); // for debug you can use 'demo-interstitial-yandex'R-M-14552552-2
   }
 
+  ///sets number of ads shown to control ad appearance
   static Future<void> setNumberOfCardsShown(int value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_keyCards, value);
   }
 
+  ///gets number of ads shown to control ad appearance
   static Future<int> getNumberOfCardsShown() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getInt(_keyCards) ?? 0;
   }
 
+  ///increments number of ads shown to control ad appearance
   static Future<void> incrementCardsShown() async {
     final current = await getNumberOfCardsShown();
     await setNumberOfCardsShown(current + 1);
