@@ -5,10 +5,10 @@ import 'package:taro_cards/bloc/tarot_card_bloc.dart';
 import 'package:taro_cards/bloc/tarot_card_state.dart';
 import 'package:taro_cards/widgets/tarot_card_list.dart';
 import 'package:taro_cards/widgets/custom_app_bar.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../bloc/locale_bloc.dart';
 import '../bloc/locale_event.dart';
 import '../bloc/tarot_card_event.dart';
+import '../l10n/app_localizations.dart';
 import '../models/tarot_card.dart';
 
 ///main page with app bar, list of cards, bottom navigation bar
@@ -70,59 +70,59 @@ class _CardsListState extends State<MainPage> {
                 child: CustomAppBar(
                     searchHandler: _searchCards, controller: editingController),
               ),
-              Align(
-                alignment: Alignment.center,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 12.0),
-                  child: InkResponse(
+              InkResponse(
+                highlightColor: Colors.transparent,
+                splashColor: Colors.transparent,
+                onTap: () async {
+                  final newLocale = currentLocale.languageCode == 'en'
+                      ? Locale('ru')
+                      : Locale('en');
+                  duplicateTaroCards.clear();
+                  //await TarotCardsDatabase().init(newLocale.languageCode);
+                  //appState.setLocale(newLocale);
+                  final category;
+
+                  switch (pageIndex) {
+                    case 0:
+                      category = newLocale.languageCode == 'en'
+                          ? 'Major Arcana'
+                          : 'Старшие арканы';
+                      break;
+                    case 1:
+                      category =
+                          newLocale.languageCode == 'en' ? 'Wands' : 'Жезлы';
+                      break;
+                    case 2:
+                      category =
+                          newLocale.languageCode == 'en' ? 'Cups' : 'Кубки';
+                      break;
+                    case 3:
+                      category =
+                          newLocale.languageCode == 'en' ? 'Swords' : 'Мечи';
+                      break;
+                    case 4:
+                      category = newLocale.languageCode == 'en'
+                          ? 'Pentacles'
+                          : 'Пентакли';
+                      break;
+                    default:
+                      category = newLocale.languageCode == 'en'
+                          ? 'Major Arcana'
+                          : 'Старшие арканы';
+                  }
+                  context.read<LocaleBloc>().add(
+                        ChangeLocale(locale: newLocale, category: category),
+                      );
+                  //refreshTaroCards(category);
+                },
+                child: SizedBox(
+                  height: 60,
+                  width: 60,
+                  child: Center(
                     child: Text(
                       currentLocale.languageCode.toUpperCase(),
                       style: const TextStyle(fontSize: 24, color: Colors.white),
                     ),
-                    onTap: () async {
-                      final newLocale = currentLocale.languageCode == 'en'
-                          ? Locale('ru')
-                          : Locale('en');
-                      duplicateTaroCards.clear();
-                      //await TarotCardsDatabase().init(newLocale.languageCode);
-                      //appState.setLocale(newLocale);
-                      final category;
-
-                      switch (pageIndex) {
-                        case 0:
-                          category = newLocale.languageCode == 'en'
-                              ? 'Major Arcana'
-                              : 'Старшие арканы';
-                          break;
-                        case 1:
-                          category = newLocale.languageCode == 'en'
-                              ? 'Wands'
-                              : 'Жезлы';
-                          break;
-                        case 2:
-                          category =
-                              newLocale.languageCode == 'en' ? 'Cups' : 'Кубки';
-                          break;
-                        case 3:
-                          category = newLocale.languageCode == 'en'
-                              ? 'Swords'
-                              : 'Мечи';
-                          break;
-                        case 4:
-                          category = newLocale.languageCode == 'en'
-                              ? 'Pentacles'
-                              : 'Пентакли';
-                          break;
-                        default:
-                          category = newLocale.languageCode == 'en'
-                              ? 'Major Arcana'
-                              : 'Старшие арканы';
-                      }
-                      context.read<LocaleBloc>().add(
-                            ChangeLocale(locale: newLocale, category: category),
-                          );
-                      //refreshTaroCards(category);
-                    },
                   ),
                 ),
               )
@@ -182,7 +182,9 @@ class _CardsListState extends State<MainPage> {
     if (searchText.isNotEmpty) {
       List<TarotCard> dummyListData = [];
       for (var item in dummySearchList) {
-        if (item.cardName.toLowerCase().contains(searchText)) {
+        if (item.cardName
+            .toLowerCase()
+            .contains(searchText.trim().toLowerCase())) {
           dummyListData.add(item);
         }
       }
@@ -229,9 +231,15 @@ class _CardsListState extends State<MainPage> {
                 pageIndex = 0;
               });
             },
-            icon: pageIndex == 0
-                ? Image.asset('assets/icons/main_arcana_purple.png')
-                : Image.asset('assets/icons/main_arcana_grey.png'),
+            splashRadius: 1,
+            highlightColor: Colors.transparent,
+            splashColor: Colors.transparent,
+            icon: Image.asset(
+              'assets/icons/main_arcana_purple.png',
+              color: pageIndex == 0
+                  ? const Color(0xFF690083)
+                  : const Color(0xFFCDCDCD),
+            ),
           ),
           IconButton(
             enableFeedback: false,
@@ -242,9 +250,15 @@ class _CardsListState extends State<MainPage> {
                 pageIndex = 1;
               });
             },
-            icon: pageIndex == 1
-                ? Image.asset('assets/icons/wands_purple.png')
-                : Image.asset('assets/icons/wands_grey.png'),
+            splashRadius: 1,
+            highlightColor: Colors.transparent,
+            splashColor: Colors.transparent,
+            icon: Image.asset(
+              'assets/icons/wands_purple.png',
+              color: pageIndex == 1
+                  ? const Color(0xFF690083)
+                  : const Color(0xFFCDCDCD),
+            ),
           ),
           IconButton(
             enableFeedback: false,
@@ -255,9 +269,15 @@ class _CardsListState extends State<MainPage> {
                 pageIndex = 2;
               });
             },
-            icon: pageIndex == 2
-                ? Image.asset('assets/icons/cups_purple.png')
-                : Image.asset('assets/icons/cups_grey.png'),
+            splashRadius: 1,
+            highlightColor: Colors.transparent,
+            splashColor: Colors.transparent,
+            icon: Image.asset(
+              'assets/icons/cups_purple.png',
+              color: pageIndex == 2
+                  ? const Color(0xFF690083)
+                  : const Color(0xFFCDCDCD),
+            ),
           ),
           IconButton(
             enableFeedback: false,
@@ -268,9 +288,15 @@ class _CardsListState extends State<MainPage> {
                 pageIndex = 3;
               });
             },
-            icon: pageIndex == 3
-                ? Image.asset('assets/icons/swords_purple.png')
-                : Image.asset('assets/icons/swords_grey.png'),
+            splashRadius: 1,
+            highlightColor: Colors.transparent,
+            splashColor: Colors.transparent,
+            icon: Image.asset(
+              'assets/icons/swords_purple.png',
+              color: pageIndex == 3
+                  ? const Color(0xFF690083)
+                  : const Color(0xFFCDCDCD),
+            ),
           ),
           IconButton(
             enableFeedback: false,
@@ -281,9 +307,15 @@ class _CardsListState extends State<MainPage> {
                 pageIndex = 4;
               });
             },
-            icon: pageIndex == 4
-                ? Image.asset('assets/icons/pentacles_purple.png')
-                : Image.asset('assets/icons/pentacles_grey.png'),
+            splashRadius: 1,
+            highlightColor: Colors.transparent,
+            splashColor: Colors.transparent,
+            icon: Image.asset(
+              'assets/icons/pentacles_purple.png',
+              color: pageIndex == 4
+                  ? const Color(0xFF690083)
+                  : const Color(0xFFCDCDCD),
+            ),
           ),
         ],
       ),
