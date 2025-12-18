@@ -92,4 +92,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get cardsdb => 'cards.db';
+
+  @override
+  String get chooseLang => 'Выберите язык';
+
+  @override
+  String get yearReading => 'прогноз на 2026 год';
 }

@@ -11,7 +11,18 @@ import '../bloc/tarot_card_event.dart';
 import '../l10n/app_localizations.dart';
 import '../models/tarot_card.dart';
 
-///main page with app bar, list of cards, bottom navigation bar
+/// Main application page.
+///
+/// Displays:
+/// - a searchable app bar,
+/// - a grid of tarot cards,
+/// - a bottom navigation bar for card categories.
+///
+/// Handles:
+/// - internet connectivity state,
+/// - language switching,
+/// - category navigation,
+/// - card search filtering.
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
 
@@ -20,17 +31,24 @@ class MainPage extends StatefulWidget {
 }
 
 class _CardsListState extends State<MainPage> {
-  ///list of tarot cards
+  /// Current list of tarot cards displayed on the screen.
   late List<TarotCard> taroCards;
 
-  ///list of tarot cards for search implementation
+  /// Backup list of tarot cards used for search filtering.
+  ///
+  /// Allows restoring the full list when the search query is cleared.
   late List<TarotCard> duplicateTaroCards = [];
+
+  /// Indicates whether the device has an active internet connection.
   bool isInternetConnected = true;
 
-  ///controller for emptying search when navigationg to another list of cards
-  TextEditingController editingController = TextEditingController();
+  /// Controller used to clear the search field
+  /// when switching between card categories.
+  final TextEditingController editingController = TextEditingController();
 
-  ///index for navigation between different lists of cards (major arcana, wand etc)
+  /// Index of the currently selected card category.
+  ///
+  /// Used for bottom navigation state and localization updates.
   int pageIndex = 0;
 
   @override
@@ -53,7 +71,10 @@ class _CardsListState extends State<MainPage> {
     });
   }
 
-  ///builds app bar, list of cards and bottom navigation
+  /// Builds the main page layout including:
+  /// - custom app bar with search,
+  /// - tarot cards grid,
+  /// - bottom navigation bar.
   @override
   Widget build(BuildContext context) {
     final currentLocale =
@@ -175,7 +196,9 @@ class _CardsListState extends State<MainPage> {
     );
   }
 
-  ///filtering cards
+  /// Filters tarot cards based on search input.
+  ///
+  /// Performs case-insensitive matching against card names.
   void _searchCards(String searchText) {
     List<TarotCard> dummySearchList = [];
     dummySearchList.addAll(duplicateTaroCards);
@@ -201,14 +224,25 @@ class _CardsListState extends State<MainPage> {
     }
   }
 
-  ///changes the list of cards
+  /// Requests tarot cards for the selected category.
+  ///
+  /// Clears cached search data and triggers
+  /// a new [LoadCardsByCategory] event.
   Future refreshTaroCards(category) async {
     duplicateTaroCards.clear();
     context.read<TarotCardBloc>().add(LoadCardsByCategory(
         category, context.read<LocaleBloc>().state.languageCode));
   }
 
-  ///bottom navigation
+  /// Builds the bottom navigation bar
+  /// for switching between tarot card categories.
+  ///
+  /// Categories include:
+  /// - Major Arcana
+  /// - Wands
+  /// - Cups
+  /// - Swords
+  /// - Pentacles
   Container buildMyNavBar(BuildContext context) {
     return Container(
       height: 60,

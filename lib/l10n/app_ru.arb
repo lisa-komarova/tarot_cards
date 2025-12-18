@@ -26,5 +26,7 @@
   "cups": "Кубки",
   "swords": "Мечи",
   "pentacles": "Пентакли",
-  "cardsdb": "cards.db"
+  "cardsdb": "cards.db",
+  "chooseLang" : "Выберите язык",
+  "yearReading" : "прогноз на 2026 год"
 }

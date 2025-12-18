@@ -92,4 +92,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cardsdb => 'cards_en.db';
+
+  @override
+  String get chooseLang => 'Choose language';
+
+  @override
+  String get yearReading => 'tarot reading for 2026';
 }

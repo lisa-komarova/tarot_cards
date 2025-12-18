@@ -26,5 +26,7 @@
   "cups": "Cups",
   "swords": "Swords",
   "pentacles": "Pentacles",
-  "cardsdb": "cards_en.db"
+  "cardsdb": "cards_en.db",
+  "chooseLang" : "Choose language",
+  "yearReading" : "tarot reading for 2026"
 }

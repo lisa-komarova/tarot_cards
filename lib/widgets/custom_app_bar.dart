@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 
-/// App bar with search
+/// Custom app bar widget containing a search input field.
+///
+/// Provides a styled text field that reports search input
+/// changes via a callback.
 class CustomAppBar extends StatefulWidget {
+  /// Callback triggered whenever the search text changes.
   final void Function(String searchText) searchHandler;
+
+  /// Controller used to manage the search input text.
   final TextEditingController controller;
 
   const CustomAppBar({

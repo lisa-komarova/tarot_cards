@@ -10,10 +10,19 @@ import 'package:taro_cards/widgets/card_value_widget.dart';
 import '../bloc/locale_bloc.dart';
 import '../database/cards_database.dart';
 
-///widget for showing and hiding value of a card
+/// A widget that displays an expandable button
+/// for showing and hiding tarot card meanings.
+///
+/// The widget loads card values asynchronously
+/// and reveals the content with a smooth animation.
 class CardValueButtonAnimated extends StatefulWidget {
-  ///situation in which card is read (meaning in love, card of a day etc)
+  /// The context in which the card is interpreted
+  /// (e.g. love, card of the day, advice).
+  ///
+  /// Used as a title for the expandable button.
   final String title;
+
+  /// The tarot card for which meanings are loaded and displayed.
   final TarotCard taroCard;
   const CardValueButtonAnimated(
       {super.key, required this.title, required this.taroCard});
@@ -25,13 +34,21 @@ class _CardValueButtonAnimatedState extends State<CardValueButtonAnimated>
     with SingleTickerProviderStateMixin {
   static const _color = Colors.white;
   bool isLoading = true;
+
+  /// List of meanings for the selected tarot card.
+  ///
+  /// Each index corresponds to a specific reading context
+  /// (general, love, advice, etc.).
   List<CardValue?>? cardValues = [];
   late final AnimationController _controller = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 300),
   );
 
-  ///controls whether the value is shown
+  /// Toggles the visibility of the card meaning section.
+  ///
+  /// Plays the animation forward when collapsed
+  /// and reverses it when expanded.
   void _toggleCard() {
     if (_controller.isDismissed) {
       _controller.forward();
@@ -46,7 +63,11 @@ class _CardValueButtonAnimatedState extends State<CardValueButtonAnimated>
     getTaroCardValue();
   }
 
-  ///reads values of a card (meaning in love, card of a day etc)
+  /// Loads all meanings for the selected tarot card
+  /// from the local database.
+  ///
+  /// The language is determined by the current
+  /// [LocaleBloc] state.
   Future getTaroCardValue() async {
     setState(() => isLoading = true);
 

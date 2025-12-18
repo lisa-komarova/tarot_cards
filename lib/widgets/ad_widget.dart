@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yandex_mobileads/mobile_ads.dart';
 
-///builds banner ad
+///A widget for displaying a banner ad
 class BannerAdvertisement extends StatefulWidget {
   final int screenWidth;
   const BannerAdvertisement({super.key, required this.screenWidth});
@@ -27,7 +27,7 @@ class _BannerAdvertisementState extends State<BannerAdvertisement> {
 
   _createBanner() {
     return BannerAd(
-        adUnitId: 'demo-banner-yandex',
+        adUnitId: 'R-M-14552552-1',
         // or 'demo-banner-yandex' R-M-14552552-1
         adSize: _getAdSize(),
         adRequest: const AdRequest(),

@@ -4,14 +4,17 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/app_localizations.dart';
 
-///A widget that represent a link to a source of info
+/// Displays a tappable text link pointing to an external source.
+///
+/// When tapped, the widget attempts to open the provided URL
+/// using the system browser
 class SourceWidget extends StatelessWidget {
+  /// URL of the external source to be opened.
   final String url;
   const SourceWidget({
     super.key,
     required this.url,
   });
-
   @override
   Widget build(BuildContext context) {
     return Container(

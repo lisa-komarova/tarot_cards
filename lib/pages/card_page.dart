@@ -9,14 +9,17 @@ import 'package:taro_cards/widgets/ad_widget.dart';
 import 'package:taro_cards/widgets/card_value_button_animated.dart';
 import 'package:taro_cards/widgets/combination_widget.dart';
 import 'package:taro_cards/widgets/source_widget.dart';
+import 'package:taro_cards/widgets/year_spread.dart';
 
 import '../bloc/locale_bloc.dart';
 import '../bloc/tarot_card_bloc.dart';
 import '../l10n/app_localizations.dart';
 
-///cardpage widget is for displaying tarot card and its values
+/// A page that displays detailed information about a tarot card,
+/// including its image, basic characteristics, meanings,
+/// yearly spread, combinations, and source link.
 class CardPage extends StatefulWidget {
-  ///tarot card id
+  /// Unique identifier of the tarot card.
   final int cardId;
 
   const CardPage({super.key, required this.cardId});
@@ -31,7 +34,6 @@ class _CardPageState extends State<CardPage> {
   @override
   void initState() {
     super.initState();
-    // getTaroCard();
   }
 
   @override
@@ -65,14 +67,9 @@ class _CardPageState extends State<CardPage> {
     );
   }
 
-  ///reads tarot card from db
-  Future getTaroCard() async {
-    context.read<TarotCardBloc>().add(LoadTarotCardWithValues(
-        widget.cardId, context.read<LocaleBloc>().state.languageCode));
-    //taroCard = (await TarotCardsDatabase().readTarotCard(widget.cardId))!;
-  }
-
-  ///builds tarot card, its values and combination of the card with other cards
+  /// Builds the main scrollable content of the tarot card page,
+  /// including image, characteristics, meanings, combinations,
+  /// advertisement, and source link.
   Widget buildTaroCard() {
     return SingleChildScrollView(
       child: Column(
@@ -134,6 +131,7 @@ class _CardPageState extends State<CardPage> {
           ),
           Column(
             children: [
+              YearSpread(taroCard: taroCard),
               CardValueButtonAnimated(
                 title: AppLocalizations.of(context).theGeneralMeaning,
                 taroCard: taroCard,
@@ -175,7 +173,8 @@ class _CardPageState extends State<CardPage> {
     );
   }
 
-  ///builds basic characteristics of a tarot card
+  /// Builds a labeled text block representing a single
+  /// tarot card characteristic (e.g. category, meaning).
   Widget _buildCardCharacteristic(String characteristic, String value) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -196,7 +195,8 @@ class _CardPageState extends State<CardPage> {
     );
   }
 
-  ///builds a container with the image of a tarot card
+  /// Builds a styled container with the tarot card image
+  /// loaded from network and cached locally.
   Widget _buildTaroCardImage() {
     return Container(
       margin: const EdgeInsets.all(10),

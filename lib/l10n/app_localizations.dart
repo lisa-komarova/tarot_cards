@@ -265,6 +265,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'cards_en.db'**
   String get cardsdb;
+
+  /// No description provided for @chooseLang.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose language'**
+  String get chooseLang;
+
+  /// No description provided for @yearReading.
+  ///
+  /// In en, this message translates to:
+  /// **'tarot reading for 2026'**
+  String get yearReading;
 }
 
 class _AppLocalizationsDelegate

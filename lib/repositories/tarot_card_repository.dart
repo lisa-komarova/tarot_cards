@@ -4,7 +4,7 @@ import '../database/cards_database.dart';
 import '../models/card_combination.dart';
 import '../models/tarot_card.dart';
 
-/// repository for working with Tarot cards
+/// Repository for working with Tarot cards
 /// provides methods to retrieve, store, and update Tarot card data
 class TarotCardRepository {
   final TarotCardsDatabase _dbHelper = TarotCardsDatabase();

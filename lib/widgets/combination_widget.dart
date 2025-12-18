@@ -8,9 +8,13 @@ import 'package:taro_cards/models/tarot_card.dart';
 import '../bloc/locale_bloc.dart';
 import '../l10n/app_localizations.dart';
 
-///builds two cards and their combination meaning
-///the second card is chosen in a dialog
+/// Displays a tarot card combination interpretation.
+///
+/// The widget allows selecting a second card and shows
+/// the combined meaning of two tarot cards with
+/// an expandable animated layout.
 class CombinationWidget extends StatefulWidget {
+  /// The primary tarot card used for the combination.
   final TarotCard taroCard;
 
   const CombinationWidget({super.key, required this.taroCard});
@@ -29,13 +33,23 @@ class _CombinationWidgetState extends State<CombinationWidget>
   );
 
   bool isLoading = true;
+
+  /// Currently selected second tarot card.
   late TarotCard _secondCard;
+
+  /// List of all available tarot cards except the primary one.
   List<TarotCard> _taroCards = [];
+
+  /// Future that loads all tarot cards from the database.
   late final Future<List<TarotCard>> _loadedTaroCards;
+
   late CardCombination _cardCombintaion;
+
+  /// Controller used for filtering cards inside the dialog.
   final TextEditingController _searchController = TextEditingController();
 
-  ///controls whether the combination is shown
+  /// Toggles the visibility of the combination section
+  /// using an animated expand / collapse effect.
   void _toggleCard() {
     if (_controller.isDismissed) {
       _controller.forward();
@@ -60,7 +74,8 @@ class _CombinationWidgetState extends State<CombinationWidget>
     super.initState();
   }
 
-  ///gets the meaning of the combination of two cards
+  /// Loads the interpretation for the selected
+  /// combination of two tarot cards.
   void _readCardCombination() async {
     var cardCombintaion = (await TarotCardsDatabase.instance.readCombination(
         widget.taroCard,
@@ -71,9 +86,8 @@ class _CombinationWidgetState extends State<CombinationWidget>
     });
   }
 
-  ///gets the list of cards for drop-down list
-  ///sets the default second card
-  ///and the combination with the second card
+  /// Loads all tarot cards from the database,
+  /// excluding the primary card.
   Future<List<TarotCard>> _readTaroCards() async {
     final locale = context.read<LocaleBloc>().state;
     final List<TarotCard> allTaroCards =
@@ -84,7 +98,8 @@ class _CombinationWidgetState extends State<CombinationWidget>
     return allTaroCards;
   }
 
-  ///sets the second card and gets its combination
+  /// Updates the second card selection and reloads
+  /// the corresponding card combination.
   void _changeSecondCard(dynamic taroCardName) {
     if (taroCardName != null) {
       setState(() {
@@ -281,8 +296,8 @@ class _CombinationWidgetState extends State<CombinationWidget>
     ]);
   }
 
-  ///builds the dialog with the list of
-  ///available cards to choose as a second card
+  /// Builds a dialog allowing the user to select
+  /// the second tarot card from a searchable list.
   Future<void> _buildCardCombinationDialog(
       BuildContext context, List<String> taroCardsNames, TarotCard secondCard) {
     List<String> duplicateTaroCardsNames = [];
